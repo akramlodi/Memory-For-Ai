@@ -13,16 +13,18 @@ import logging
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
-PROVIDERS = ("anthropic", "openai", "ollama")
+PROVIDERS = ("anthropic", "openai", "ollama", "azure")
 DEFAULT_MODELS = {
     "anthropic": "claude-opus-5-5",
     "openai": "gpt-4o-mini",
     "ollama": "qwen2.5:7b",
+    "azure": "gpt-4o",  # for Azure this is the *deployment name*
 }
 
 
@@ -49,6 +51,9 @@ class Settings:
     anthropic_api_key: str = ""
     openai_api_key: str = ""
     ollama_base_url: str = "http://localhost:11434"
+    azure_endpoint: str = ""
+    azure_api_key: str = ""
+    azure_use_entra_id: bool = False
     embedding_backend: str = "fastembed"
     embedding_model: str = "BAAI/bge-small-en-v1.5"
     database_path: Path = field(default_factory=lambda: PROJECT_ROOT / "data" / "memory.db")
@@ -61,6 +66,18 @@ class Settings:
     @property
     def model(self) -> str:
         return self.llm_model or DEFAULT_MODELS.get(self.llm_provider, "")
+
+    @property
+    def azure_base_url(self) -> str:
+        """The OpenAI-compatible v1 URL for an Azure AI Foundry resource.
+
+        Accepts the project endpoint (https://<res>.services.ai.azure.com/api/projects/<p>),
+        the resource URL, or the full .../openai/v1 URL, and normalises them all.
+        """
+        url = urlparse(self.azure_endpoint.strip())
+        if not url.scheme or not url.netloc:
+            return ""
+        return f"{url.scheme}://{url.netloc}/openai/v1"
 
     def validate_llm(self) -> None:
         """Raise a friendly ConfigError if the LLM provider is not usable."""
@@ -79,6 +96,17 @@ class Settings:
                 "LLM_PROVIDER=openai but OPENAI_API_KEY is empty. "
                 "Add your key to .env (see .env.example), or switch to LLM_PROVIDER=ollama for a keyless setup."
             )
+        if self.llm_provider == "azure":
+            if not self.azure_base_url:
+                raise ConfigError(
+                    "LLM_PROVIDER=azure but AZURE_ENDPOINT is missing or not a URL. Set it to your Azure AI "
+                    "Foundry endpoint, e.g. https://<resource>.services.ai.azure.com/api/projects/<project>."
+                )
+            if not self.azure_api_key and not self.azure_use_entra_id:
+                raise ConfigError(
+                    "LLM_PROVIDER=azure needs either AZURE_API_KEY, or AZURE_USE_ENTRA_ID=true to sign in "
+                    "with your Azure identity (az login) instead of a key."
+                )
 
 
 def load_settings() -> Settings:
@@ -105,6 +133,9 @@ def load_settings() -> Settings:
         anthropic_api_key=(env("ANTHROPIC_API_KEY") or "").strip(),
         openai_api_key=(env("OPENAI_API_KEY") or "").strip(),
         ollama_base_url=(env("OLLAMA_BASE_URL") or "http://localhost:11434").rstrip("/"),
+        azure_endpoint=(env("AZURE_ENDPOINT") or "").strip(),
+        azure_api_key=(env("AZURE_API_KEY") or "").strip(),
+        azure_use_entra_id=(env("AZURE_USE_ENTRA_ID") or "").strip().lower() in ("1", "true", "yes"),
         embedding_backend=backend,
         embedding_model=env("EMBEDDING_MODEL") or "BAAI/bge-small-en-v1.5",
         database_path=db_path,
