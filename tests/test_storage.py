@@ -1,3 +1,4 @@
+from tests.fakes import FakeLLM
 import numpy as np
 
 from mini_supermemory.chunking import chunk_text
@@ -70,7 +71,7 @@ def test_api_add_and_search(tmp_path, monkeypatch):
     from mini_supermemory.config import Settings
     from mini_supermemory.engine import MemoryEngine
 
-    eng = MemoryEngine(Settings(embedding_backend="hash"), embedder=HashEmbedder(), db_path=tmp_path / "a.db")
+    eng = MemoryEngine(Settings(embedding_backend="hash"), embedder=HashEmbedder(), llm=FakeLLM(), db_path=tmp_path / "a.db")
     monkeypatch.setattr(api, "get_engine", lambda: eng)
     client = TestClient(api.app)
     assert client.post("/v1/add", json={"content": "I love Adidas sneakers", "container_tag": "khan"}).status_code == 200

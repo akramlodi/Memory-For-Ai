@@ -10,10 +10,17 @@ from mini_supermemory.config import Settings
 from mini_supermemory.embeddings import HashEmbedder
 from mini_supermemory.engine import MemoryEngine
 
+from .fakes import FakeLLM
+
 
 @pytest.fixture
-def engine(tmp_path):
+def fake_llm():
+    return FakeLLM()
+
+
+@pytest.fixture
+def engine(tmp_path, fake_llm):
     settings = Settings(embedding_backend="hash", database_path=tmp_path / "test.db")
-    eng = MemoryEngine(settings, embedder=HashEmbedder())
+    eng = MemoryEngine(settings, embedder=HashEmbedder(), llm=fake_llm)
     yield eng
     eng.close()
