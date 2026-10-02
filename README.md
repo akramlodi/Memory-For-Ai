@@ -74,7 +74,7 @@ flowchart LR
         EXT --> LNK[Link: shortlist by embedding,<br/>judge NEW/UPDATES/EXTENDS/DUPLICATE - LLM]
         RET[Retrieve: semantic + FTS5 + RRF,<br/>filter current & unexpired]
     end
-    E --> LLM[(LLM provider:<br/>Anthropic / OpenAI / Ollama)]
+    E --> LLM[(LLM provider:<br/>Anthropic / OpenAI /<br/>Azure AI Foundry / Ollama)]
     E --> EMB[(Local embeddings:<br/>bge-small via fastembed)]
     E --> DB[(SQLite file<br/>data/memory.db)]
 ```
@@ -104,6 +104,7 @@ flowchart LR
 2. **One** of these:
    - an **Anthropic** API key, or
    - an **OpenAI** API key, or
+   - a model deployed in **Azure AI Foundry** (API key or Entra ID), or
    - **[Ollama](https://ollama.com)** installed locally (no key, fully offline), e.g. `ollama pull qwen2.5:7b`
 3. *(Optional)* **Claude Desktop**, for the MCP part of the demo
 
@@ -127,7 +128,7 @@ cp .env.example .env        # Windows: copy .env.example .env
 Edit `.env` and set **one** provider:
 
 ```ini
-LLM_PROVIDER=anthropic          # or: openai | ollama
+LLM_PROVIDER=anthropic          # or: openai | ollama | azure
 ANTHROPIC_API_KEY=sk-ant-...    # or OPENAI_API_KEY=..., or nothing for Ollama
 LLM_MODEL=                      # empty = default (claude-opus-5-5 / gpt-4o-mini / qwen2.5:7b)
 ```
@@ -137,6 +138,29 @@ Check that the provider works:
 ```bash
 mini-sm check
 ```
+
+<details>
+<summary><b>Using a model from Azure AI Foundry</b></summary>
+
+Copy the endpoint from your Foundry project page. The project endpoint works as-is; it is
+converted to the OpenAI-compatible `https://<resource>.services.ai.azure.com/openai/v1` URL.
+`LLM_MODEL` is your **deployment name** (shown under *Models + endpoints*), not the model family.
+
+```ini
+LLM_PROVIDER=azure
+AZURE_ENDPOINT=https://<resource>.services.ai.azure.com/api/projects/<project>
+AZURE_API_KEY=<key from the Foundry portal>
+LLM_MODEL=gpt-4o                # your deployment name
+```
+
+To sign in with your Azure identity instead of a key (`az login`, managed identity, ...), set
+`AZURE_USE_ENTRA_ID=true`, leave `AZURE_API_KEY` empty and install the extra:
+`pip install -e ".[azure]"`. Your identity needs a role such as *Azure AI User* on the resource.
+
+Any chat model deployed in Foundry should work (GPT-4o, GPT-4.1, o-series, gpt-5, and partner
+models served through the same endpoint). For reasoning models (o-series, gpt-5),
+`temperature` is not sent.
+</details>
 
 If the configuration is wrong you get a plain explanation instead of a stack trace, for example
 `LLM_PROVIDER=anthropic but ANTHROPIC_API_KEY is empty...` or
@@ -357,7 +381,7 @@ table from `evaluation/results/latest.md` here._ A full run makes roughly 300–
 | **The question is ingested *after* answering** (`remember`) | So the RAG baseline never retrieves the question itself as context. |
 | **Same prompt and model for both chat answers** | Only the context differs, so the side-by-side isolates retrieval. |
 | **Default Anthropic model `claude-opus-5-5`, `effort: low` for extraction/judging** | Extraction and judging are simple structured tasks; low effort keeps them fast and cheap. Chat uses `medium`. The server-side refusal fallback is enabled for models that support it. Set `LLM_MODEL` to pick something else. |
-| **OpenAI and Ollama share one client** | Ollama exposes an OpenAI-compatible `/v1` endpoint, so one small class covers both. |
+| **OpenAI, Azure AI Foundry and Ollama share one client** | All three expose an OpenAI-compatible `/v1` endpoint, so one small class covers them. Azure accepts the Foundry *project* endpoint and normalises it, and supports either an API key or Entra ID tokens (`azure-identity`, an optional extra). Chat Completions is used rather than the Responses API because Ollama only supports the former. |
 | **MCP SDK v2 (`MCPServer`)** | The current major version of the official Python SDK. |
 
 ## Limitations
@@ -381,7 +405,7 @@ table from `evaluation/results/latest.md` here._ A full run makes roughly 300–
 ```
 mini_supermemory/
   config.py        .env loading, settings, friendly ConfigError
-  llm.py           Anthropic / OpenAI / Ollama provider abstraction
+  llm.py           Anthropic / OpenAI / Azure AI Foundry / Ollama provider abstraction
   embeddings.py    fastembed (bge-small) + hash fallback
   db.py            SQLite schema (documents, chunks, memories, edges, log, FTS5)
   chunking.py      sentence-aware chunker
