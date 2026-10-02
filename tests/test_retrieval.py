@@ -75,7 +75,7 @@ def test_invalid_mode(engine):
 
 
 def test_api_endpoints(sneakers, monkeypatch):
-    from mini_supermemory import api
+    from elephantus import api
 
     monkeypatch.setattr(api, "get_engine", lambda: sneakers)
     c = TestClient(api.app)

@@ -1,4 +1,4 @@
-from mini_supermemory.extraction import ExtractedFact, extract_facts, parse_json_object
+from elephantus.extraction import ExtractedFact, extract_facts, parse_json_object
 from tests.fakes import FakeLLM
 
 
@@ -45,7 +45,7 @@ def test_invalid_items_are_skipped():
 
 
 def test_llm_failure_keeps_document(engine, fake_llm):
-    from mini_supermemory.llm import LLMError
+    from elephantus.llm import LLMError
 
     def boom(*a, **k):
         raise LLMError("provider down")

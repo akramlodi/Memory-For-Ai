@@ -1,7 +1,7 @@
 import pytest
 
-from mini_supermemory.config import ConfigError, Settings, load_settings
-from mini_supermemory.llm import create_llm
+from elephantus.config import ConfigError, Settings, load_settings
+from elephantus.llm import create_llm
 
 PROJECT = "https://jal-resource.services.ai.azure.com/api/projects/jal"
 V1 = "https://jal-resource.services.ai.azure.com/openai/v1"

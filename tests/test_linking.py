@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from mini_supermemory.linking import Candidate, judge_relation
+from elephantus.linking import Candidate, judge_relation
 from tests.fakes import FakeLLM
 
 ADIDAS = "User loves Adidas sneakers"

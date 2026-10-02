@@ -24,7 +24,7 @@ def test_chat_remember_ingests_after_answering(engine, fake_llm):
 
 
 def test_chat_api(engine, monkeypatch):
-    from mini_supermemory import api
+    from elephantus import api
 
     monkeypatch.setattr(api, "get_engine", lambda: engine)
     r = TestClient(api.app).post("/v1/chat", json={"question": "hi?", "container_tag": "khan"})

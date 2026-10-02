@@ -1,4 +1,4 @@
-# Mini-Supermemory — Implementation Brief for Claude Code
+# Elephantus — Implementation Brief for Claude Code
 
 > **How to use this file:** This is the project brief. Read it fully before writing any code.
 > Implement the project **phase by phase, in order**. Finish each phase, verify its acceptance
@@ -10,7 +10,7 @@
 
 ## 1. Goal
 
-Build a **simpler, working, locally-runnable version of [Supermemory](https://github.com/supermemoryai/supermemory)** — a memory layer for AI applications.
+Build **Elephantus**: a simple, working, locally-runnable memory layer for AI applications.
 
 The project must **demonstrate** the core idea clearly:
 
@@ -29,25 +29,13 @@ Simplicity beats completeness. When in doubt, choose the smaller design.
 
 ## 2. Reference Material (read before starting)
 
-Study these to understand the concepts and the API shape we are imitating:
+Useful background:
 
 | Resource | Why it matters |
 |---|---|
-| Repo + README: https://github.com/supermemoryai/supermemory | Overall product, API surface (`add`, `search`, `profile`), MCP tools, architecture diagram |
-| Docs home: https://supermemory.ai/docs | Entry point |
-| Docs index (machine-readable): https://supermemory.ai/docs/llms.txt | Full list of doc pages |
-| Quickstart: https://supermemory.ai/docs/quickstart | Client usage patterns we mirror |
-| Memory vs RAG: https://supermemory.ai/docs/concepts/memory-vs-rag | **Core concept** — documents vs memories; the sneaker example |
-| Graph memory: https://supermemory.ai/docs/concepts/graph-memory | **Core concept** — updates / extends / derives, `isLatest`, forgetting |
-| How it works: https://supermemory.ai/docs/concepts/how-it-works | Relationship semantics with examples |
-| MCP docs: https://supermemory.ai/docs/supermemory-mcp/mcp | The `memory` / `recall` / `context` tool design |
-| Self-hosting overview: https://supermemory.ai/docs/self-hosting/overview | How they run locally (single process, local embeddings, configurable LLM) |
-| MemoryBench: https://supermemory.ai/docs/memorybench/overview | Inspiration for our evaluation |
 | LongMemEval: https://github.com/xiaowu0162/LongMemEval | Benchmark categories (knowledge updates, temporal reasoning) to borrow ideas from |
 | MCP Python SDK: https://github.com/modelcontextprotocol/python-sdk | For building the MCP server |
 | MCP + Claude Desktop setup: https://modelcontextprotocol.io/quickstart/user | How users connect a local MCP server |
-
-**Attribution:** This is an independent educational re-implementation inspired by Supermemory (MIT licensed). Do not copy their code. State in the README that the project is inspired by, and not affiliated with, Supermemory.
 
 ---
 
@@ -201,7 +189,7 @@ Each phase lists **what** to build and **how we know it's done**. The **how** is
 - Filter to current, unexpired memories; support a simulated time offset.
 - Search modes: `memories`, `documents` (RAG baseline), `hybrid`.
 - `profile` endpoint (static, dynamic, optional query results).
-- API shape should loosely mirror Supermemory's (`add`, `search`, `profile`) — exact signatures are your choice.
+- API shape: `add`, `search`, `profile` — exact signatures are your choice.
 - **Done when:** outdated and expired memories never appear in memory search; the profile splits correctly; the API docs page lists all endpoints.
 
 ### Phase 5 — Chat with side-by-side comparison
@@ -213,7 +201,7 @@ Each phase lists **what** to build and **how we know it's done**. The **how** is
 - **Done when:** "What sneakers should I buy?" after the sneaker sequence yields Adidas-leaning RAG context vs Puma in memory mode.
 
 ### Phase 6 — MCP server
-- Expose three tools mirroring Supermemory's design:
+- Expose three tools:
   - `memory` — save (and optionally forget) information
   - `recall` — search memories, returning results + profile summary
   - `context` — return the full profile for injection at conversation start
@@ -237,7 +225,7 @@ Each phase lists **what** to build and **how we know it's done**. The **how** is
 - **Done when:** the evaluation runs reproducibly and the results are shown in the README and UI. Report real numbers honestly, even if unflattering, and note failure cases.
 
 ### Phase 9 — Documentation & polish
-- README: what it is, the Memory-vs-RAG idea, architecture diagram, setup, run, demo walkthrough, API overview, MCP setup, evaluation results, limitations, attribution.
+- README: what it is, the Memory-vs-RAG idea, architecture diagram, setup, run, demo walkthrough, API overview, MCP setup, evaluation results, limitations.
 - Clean error messages, consistent logging, tests passing.
 - Placeholder in README for a demo GIF/screenshots.
 - **Done when:** someone unfamiliar with the project can clone, configure one provider, and complete the demo flow using only the README.

@@ -6,9 +6,9 @@ os.environ.setdefault("LLM_PROVIDER", "ollama")
 
 import pytest
 
-from mini_supermemory.config import Settings
-from mini_supermemory.embeddings import HashEmbedder
-from mini_supermemory.engine import MemoryEngine
+from elephantus.config import Settings
+from elephantus.embeddings import HashEmbedder
+from elephantus.engine import MemoryEngine
 
 from .fakes import FakeLLM
 

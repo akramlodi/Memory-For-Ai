@@ -1,8 +1,8 @@
 import json
 
-from mini_supermemory import evaluation
-from mini_supermemory.config import Settings
-from mini_supermemory.evaluation import HeuristicLLM, score
+from elephantus import evaluation
+from elephantus.config import Settings
+from elephantus.evaluation import HeuristicLLM, score
 
 
 def test_score_recall_and_stale():

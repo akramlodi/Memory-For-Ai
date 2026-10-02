@@ -7,7 +7,7 @@ import time
 import pytest
 from fastapi.testclient import TestClient
 
-from mini_supermemory import api
+from elephantus import api
 from tests.test_linking import ADIDAS, BROKE, PUMA, sneaker_llm  # noqa: F401
 
 
@@ -26,8 +26,8 @@ def test_index_and_static_assets(client):
 
 
 def test_ui_support_endpoints(client, engine, sneaker_llm, tmp_path, monkeypatch):  # noqa: F811
-    from mini_supermemory import evaluation
-    from mini_supermemory.sample_data import SAMPLE_MESSAGES
+    from elephantus import evaluation
+    from elephantus.sample_data import SAMPLE_MESSAGES
 
     assert client.get("/v1/sample-data").json() == SAMPLE_MESSAGES
     for msg in ["I love Adidas sneakers", "I'm switching to Puma"]:

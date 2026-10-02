@@ -1,10 +1,10 @@
 """Configuration loaded from environment variables / a `.env` file.
 
 The `.env` file is searched in this order:
-1. the path in ``MINI_SM_ENV_FILE`` (handy for Claude Desktop, whose working
+1. the path in ``ELEPHANTUS_ENV_FILE`` (handy for Claude Desktop, whose working
    directory is not the project),
 2. the current working directory,
-3. the project root (the folder that contains the ``mini_supermemory`` package).
+3. the project root (the folder that contains the ``elephantus`` package).
 """
 
 from __future__ import annotations
@@ -34,8 +34,8 @@ class ConfigError(Exception):
 
 def _load_env_file() -> None:
     candidates = []
-    if os.getenv("MINI_SM_ENV_FILE"):
-        candidates.append(Path(os.environ["MINI_SM_ENV_FILE"]))
+    if os.getenv("ELEPHANTUS_ENV_FILE"):
+        candidates.append(Path(os.environ["ELEPHANTUS_ENV_FILE"]))
     candidates += [Path.cwd() / ".env", PROJECT_ROOT / ".env"]
     for path in candidates:
         if path.is_file():

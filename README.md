@@ -1,4 +1,4 @@
-# 🧠 Mini-Supermemory
+# 🐘 Elephantus
 
 **A small, local memory layer for AI apps.** You send it messages and it pulls out short facts
 about the user. It links each new fact to the ones it already has and keeps track of what is
@@ -6,9 +6,7 @@ about the user. It links each new fact to the ones it already has and keeps trac
 
 > **RAG finds similar text. Memory tracks what is *currently true* about a user.**
 
-This is an independent, educational re-implementation **inspired by
-[Supermemory](https://github.com/supermemoryai/supermemory)** (MIT licensed). It is **not
-affiliated with or endorsed by Supermemory**, and none of their code is used.
+*An elephant never forgets, but it does know which of its memories are out of date.*
 
 <!-- 📸 Demo GIF / screenshots go here, e.g. docs/demo.gif -->
 > _Placeholder: demo GIF / screenshots of the side-by-side chat, memory graph and evaluation view._
@@ -79,7 +77,7 @@ flowchart LR
     E --> DB[(SQLite file<br/>data/memory.db)]
 ```
 
-- `mini_supermemory/engine.py` is the **engine**. It knows nothing about HTTP, MCP or the UI.
+- `elephantus/engine.py` is the **engine**. It knows nothing about HTTP, MCP or the UI.
 - `api.py` and `mcp_server.py` are thin layers over the **same engine and the same
   SQLite file**, so a fact saved from Claude Desktop shows up in the UI straight away.
 
@@ -120,7 +118,7 @@ pip install -e ".[dev]"
 ```
 
 <details>
-<summary><b>macOS: <code>ModuleNotFoundError: No module named 'mini_supermemory'</code> after installing</b></summary>
+<summary><b>macOS: <code>ModuleNotFoundError: No module named 'elephantus'</code> after installing</b></summary>
 
 Python 3.13+ ignores `.pth` files that have the macOS "hidden" flag, and the editable install
 relies on one. Clear the flag and the command works again:
@@ -151,7 +149,7 @@ LLM_MODEL=                      # empty = default (claude-opus-5-5 / gpt-4o-mini
 Check that the provider works:
 
 ```bash
-mini-sm check
+elephantus check
 ```
 
 <details>
@@ -184,20 +182,20 @@ If the configuration is wrong you get a plain explanation instead of a stack tra
 ### Run (one command)
 
 ```bash
-mini-sm start
+elephantus start
 ```
 
 This starts the server on http://127.0.0.1:8000 and opens the **web UI** in your browser.
 The same server hosts the **REST API** (interactive docs at `/docs`). Add `--no-browser` to skip
-opening a tab. The MCP server runs separately: `mini-sm mcp`, and Claude Desktop launches it for you.
+opening a tab. The MCP server runs separately: `elephantus mcp`, and Claude Desktop launches it for you.
 
 | Command | What it does |
 |---|---|
-| `mini-sm check` | Round-trip a prompt to the configured LLM |
-| `mini-sm start` (alias `mini-sm ui`) | Web UI + REST API, opens the browser |
-| `mini-sm api` | Same server, without opening a browser |
-| `mini-sm mcp` | MCP server over stdio (Claude Desktop launches this for you) |
-| `mini-sm eval [--offline] [--k 3]` | Run the evaluation |
+| `elephantus check` | Round-trip a prompt to the configured LLM |
+| `elephantus start` (alias `elephantus ui`) | Web UI + REST API, opens the browser |
+| `elephantus api` | Same server, without opening a browser |
+| `elephantus mcp` | MCP server over stdio (Claude Desktop launches this for you) |
+| `elephantus eval [--offline] [--k 3]` | Run the evaluation |
 
 ---
 
@@ -216,7 +214,7 @@ across the top switch views: **chat · memories · graph · profile · search ·
 
 These steps follow the north-star flow from the brief. Everything happens in the UI.
 
-1. Run `mini-sm start`; the browser opens http://127.0.0.1:8000/.
+1. Run `elephantus start`; the browser opens http://127.0.0.1:8000/.
 2. In the sidebar under **Container**, pick or type a tag (e.g. `khan`) and press Enter.
 3. In the **chat** tab, type at the `❯` prompt:
    - `I love Adidas sneakers`
@@ -249,8 +247,8 @@ remembering chat messages. The chat history for each container is kept in your b
 
 ## REST API
 
-Full interactive docs are at http://127.0.0.1:8000/docs. The shape loosely follows
-Supermemory's `add` / `search` / `profile`.
+Full interactive docs are at http://127.0.0.1:8000/docs. The core calls are `add`, `search`
+and `profile`.
 
 | Method & path | Purpose |
 |---|---|
@@ -285,7 +283,7 @@ curl -s localhost:8000/v1/profile -H 'content-type: application/json' \
 
 ## Claude Desktop (MCP)
 
-The MCP server exposes three tools that mirror Supermemory's MCP design:
+The MCP server exposes three tools:
 
 | Tool | What it does |
 |---|---|
@@ -301,11 +299,11 @@ paths** to your clone:
 ```json
 {
   "mcpServers": {
-    "mini-supermemory": {
+    "elephantus": {
       "command": "/ABSOLUTE/PATH/TO/Memory-For-Ai/.venv/bin/python",
-      "args": ["-m", "mini_supermemory.mcp_server"],
+      "args": ["-m", "elephantus.mcp_server"],
       "env": {
-        "MINI_SM_ENV_FILE": "/ABSOLUTE/PATH/TO/Memory-For-Ai/.env",
+        "ELEPHANTUS_ENV_FILE": "/ABSOLUTE/PATH/TO/Memory-For-Ai/.env",
         "DEFAULT_CONTAINER_TAG": "khan"
       }
     }
@@ -328,7 +326,7 @@ Restart Claude Desktop, and the three tools appear under the 🔧 icon.
 
 ## Evaluation
 
-`mini-sm eval` runs **25 scripted scenarios** from
+`elephantus eval` runs **25 scripted scenarios** from
 [`evaluation/dataset.json`](evaluation/dataset.json), in three categories:
 
 | Category | n | What it tests |
@@ -396,7 +394,7 @@ messages); `--limit` and `--category` run a subset.
 <details>
 <summary><b>Offline pipeline check</b> (rule-based stand-in, no LLM)</summary>
 
-`mini-sm eval --offline` swaps the LLM for a **rule-based stand-in** (sentence splitting,
+`elephantus eval --offline` swaps the LLM for a **rule-based stand-in** (sentence splitting,
 keyword cues, word overlap) and uses the **hash embedder**. It checks that the pipeline works
 end to end without a key or downloads; it is **not** a measure of real quality.
 
@@ -453,7 +451,7 @@ hash embeddings miss questions that share no words with the right memory.
 ## Project layout & tests
 
 ```
-mini_supermemory/
+elephantus/
   config.py        .env loading, settings, friendly ConfigError
   llm.py           Anthropic / OpenAI / Azure AI Foundry / Ollama provider abstraction
   embeddings.py    fastembed (bge-small) + hash fallback
@@ -468,7 +466,7 @@ mini_supermemory/
   web/             terminal-style web UI (index.html, app.css, app.js; no build step)
   evaluation.py    evaluation runner + offline rule-based stand-in
   sample_data.py   "Load sample" conversation
-  cli.py           `mini-sm` command
+  cli.py           `elephantus` command
 evaluation/
   dataset.json     25 scenarios
   results/         saved results (JSON + Markdown)
@@ -477,7 +475,7 @@ tests/             pytest suite (LLM mocked with a scripted fake)
 
 ```bash
 pytest                                  # whole suite, no API key or downloads needed
-MINI_SM_LIVE_TESTS=1 pytest -m live     # optional end-to-end test against your configured LLM
+ELEPHANTUS_LIVE_TESTS=1 pytest -m live     # optional end-to-end test against your configured LLM
 ```
 
 The suite covers the following: storage and container isolation, chunking, extraction
@@ -485,10 +483,3 @@ The suite covers the following: storage and container isolation, chunking, extra
 hybrid search, expiry with simulated time, profile, forget, the REST API, the MCP tools
 (in-process client), the web UI (static assets, plus a real-browser run of the sneaker flow
 that is skipped when Playwright isn't installed) and evaluation scoring.
-
----
-
-*Inspired by [Supermemory](https://github.com/supermemoryai/supermemory) (MIT). Not affiliated
-with Supermemory. Concepts follow their public docs on
-[memory vs RAG](https://supermemory.ai/docs/concepts/memory-vs-rag) and
-[graph memory](https://supermemory.ai/docs/concepts/graph-memory).*

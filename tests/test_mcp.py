@@ -2,7 +2,7 @@ import asyncio
 
 from mcp import Client
 
-from mini_supermemory.mcp_server import build_server
+from elephantus.mcp_server import build_server
 from tests.test_linking import ADIDAS, PUMA, sneaker_llm  # noqa: F401
 from tests.test_retrieval import SNEAKERS
 

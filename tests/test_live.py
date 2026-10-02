@@ -1,6 +1,6 @@
 """Optional end-to-end test against the real configured LLM provider.
 
-Run with:  MINI_SM_LIVE_TESTS=1 pytest -m live
+Run with:  ELEPHANTUS_LIVE_TESTS=1 pytest -m live
 (uses your .env provider; the hash embedder keeps it download-free)
 """
 
@@ -10,13 +10,13 @@ import pytest
 
 pytestmark = [
     pytest.mark.live,
-    pytest.mark.skipif(os.getenv("MINI_SM_LIVE_TESTS") != "1", reason="set MINI_SM_LIVE_TESTS=1 to run"),
+    pytest.mark.skipif(os.getenv("ELEPHANTUS_LIVE_TESTS") != "1", reason="set ELEPHANTUS_LIVE_TESTS=1 to run"),
 ]
 
 
 def test_live_sneaker_sequence(tmp_path):
-    from mini_supermemory.config import load_settings
-    from mini_supermemory.engine import MemoryEngine
+    from elephantus.config import load_settings
+    from elephantus.engine import MemoryEngine
 
     settings = load_settings()
     engine = MemoryEngine(settings, db_path=tmp_path / "live.db")
