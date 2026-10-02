@@ -242,7 +242,7 @@ Each phase lists **what** to build and **how we know it's done**. The **how** is
 - Placeholder in README for a demo GIF/screenshots.
 - **Done when:** someone unfamiliar with the project can clone, configure one provider, and complete the demo flow using only the README.
 
-### Stretch (only after all phases are complete)
+### Stretch (only after all phases are complete, then ask me)
 - `DERIVES` relation (inferred facts from patterns).
 - Recency weighting in ranking.
 - Docker / docker-compose.
