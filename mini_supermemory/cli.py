@@ -33,11 +33,19 @@ def cmd_api(args) -> int:
     return 0
 
 
+def cmd_mcp(args) -> int:
+    from .mcp_server import main as mcp_main
+
+    mcp_main()
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="mini-sm", description="Mini-Supermemory command line")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check", help="check that the configured LLM provider works").set_defaults(func=cmd_check)
     sub.add_parser("api", help="run the REST API").set_defaults(func=cmd_api)
+    sub.add_parser("mcp", help="run the MCP server over stdio (for Claude Desktop)").set_defaults(func=cmd_mcp)
     args = parser.parse_args(argv)
     try:
         settings = load_settings()

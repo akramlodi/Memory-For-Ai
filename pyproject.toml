@@ -18,7 +18,7 @@ dependencies = [
     "anthropic>=0.40",
     "openai>=1.40",
     "fastembed>=0.4",
-    "mcp>=1.2",
+    "mcp>=2.2,<3",
     "streamlit>=1.35",
 ]
 
