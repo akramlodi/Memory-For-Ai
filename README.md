@@ -123,14 +123,15 @@ pip install -e ".[dev]"
 <summary><b>macOS: <code>ModuleNotFoundError: No module named 'mini_supermemory'</code> after installing</b></summary>
 
 Python 3.13+ ignores `.pth` files that have the macOS "hidden" flag, and the editable install
-relies on one. Clear the flag and the command works again (re-run it after any reinstall):
+relies on one. Clear the flag and the command works again:
 
 ```bash
 chflags -R nohidden .venv
 ```
 
-This tends to happen in folders synced by iCloud (e.g. `~/Desktop`, `~/Documents`); cloning
-the project elsewhere avoids it.
+The usual cause is iCloud "Desktop & Documents" sync, which keeps re-applying the flag to
+projects in `~/Desktop` or `~/Documents`, so the error comes back on its own. The permanent fix
+is to keep the project outside those folders (e.g. `~/projects`) and recreate the venv there.
 </details>
 
 ### Configure
