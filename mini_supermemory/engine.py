@@ -22,12 +22,15 @@ from .embeddings import Embedder, create_embedder
 from .extraction import extract_facts
 from .linking import Candidate, judge_relation
 from .llm import LLMError, create_llm
-from .search import cosine_top_k
+from .search import cosine_top_k, fts_query, reciprocal_rank_fusion
 
 log = logging.getLogger(__name__)
 
 HOUR = 3600.0
 LINK_CANDIDATES = 5  # how many similar current memories the relation judge sees
+SEARCH_MODES = ("memories", "documents", "hybrid")
+FORGET_MIN_SIMILARITY = 0.3  # forgetting "by content" needs at least this cosine similarity
+DYNAMIC_PROFILE_LIMIT = 10
 
 # SQL condition for "current" memories: latest version, not forgotten, not expired at :now.
 CURRENT = "is_latest = 1 AND forgotten_at IS NULL AND (expires_at IS NULL OR expires_at > :now)"
@@ -192,6 +195,75 @@ class MemoryEngine:
                 "memory_id": memory_id, "target_ids": judgement.target_ids, "reason": judgement.reason}
 
     # -------------------------------------------------------------- retrieval
+    def search(self, q: str, container_tag: str, mode: str = "memories", limit: int = 5,
+               time_offset_hours: float = 0.0) -> list[dict]:
+        """Search a container.
+
+        * ``memories``  — hybrid (semantic + keyword, RRF) over current, unexpired memories
+        * ``documents`` — the naive RAG baseline: embedding similarity over raw chunks
+        * ``hybrid``    — memories and chunks together, semantic + keyword, fused with RRF
+        """
+        if mode not in SEARCH_MODES:
+            raise ValueError(f"mode must be one of {SEARCH_MODES}")
+        if not (q or "").strip():
+            raise ValueError("q must be a non-empty string")
+        tag = _validate_tag(container_tag)
+        now_ts = self.now(time_offset_hours)
+        if mode == "documents":
+            return self.search_documents(q, tag, limit)
+
+        qvec = self._embed([q])[0]
+        items: dict[str, dict] = {}
+        rankings = []
+        for ranking, found in [self._memory_rankings(q, qvec, tag, now_ts)] + (
+            [self._chunk_rankings(q, qvec, tag)] if mode == "hybrid" else []
+        ):
+            rankings += ranking
+            items.update(found)
+        fused = reciprocal_rank_fusion(rankings)[:limit]
+        return [{**items[i], "score": round(score, 5)} for i, score in fused]
+
+    def _memory_rankings(self, q: str, qvec: np.ndarray, tag: str, now_ts: float):
+        rows = self._current_memory_rows(tag, now_ts)
+        if not rows:
+            return [], {}
+        by_id = {r["id"]: r for r in rows}
+        matrix = np.stack([db.from_blob(r["embedding"]) for r in rows])
+        sims = {rows[i]["id"]: sim for i, sim in cosine_top_k(qvec, matrix, len(rows))}
+        semantic = list(sims)
+        keyword: list[str] = []
+        match = fts_query(q)
+        if match:
+            with self._lock:
+                hits = self.conn.execute(
+                    "SELECT memory_id FROM memories_fts WHERE memories_fts MATCH ? AND container_tag = ?"
+                    " ORDER BY bm25(memories_fts) LIMIT 100", (match, tag)
+                ).fetchall()
+            keyword = [h[0] for h in hits if h[0] in by_id]  # keep only current memories
+        found = {mid: {**self._memory_dict(by_id[mid]), "similarity": round(sims[mid], 4)} for mid in by_id}
+        return [semantic, keyword], found
+
+    def _chunk_rankings(self, q: str, qvec: np.ndarray, tag: str):
+        with self._lock:
+            rows = self.conn.execute(
+                "SELECT id, document_id, text, embedding, created_at FROM chunks WHERE container_tag = ?", (tag,)
+            ).fetchall()
+        if not rows:
+            return [], {}
+        matrix = np.stack([db.from_blob(r["embedding"]) for r in rows])
+        sims = {rows[i]["id"]: sim for i, sim in cosine_top_k(qvec, matrix, len(rows))}
+        keyword: list[str] = []
+        match = fts_query(q)
+        if match:
+            with self._lock:
+                keyword = [h[0] for h in self.conn.execute(
+                    "SELECT chunk_id FROM chunks_fts WHERE chunks_fts MATCH ? AND container_tag = ?"
+                    " ORDER BY bm25(chunks_fts) LIMIT 100", (match, tag)
+                ).fetchall()]
+        found = {r["id"]: {"type": "chunk", "id": r["id"], "document_id": r["document_id"], "text": r["text"],
+                           "similarity": round(sims[r["id"]], 4), "created_at": r["created_at"]} for r in rows}
+        return [list(sims), keyword], found
+
     def search_documents(self, query: str, container_tag: str, limit: int = 5) -> list[dict]:
         """RAG baseline: pure embedding similarity over document chunks."""
         tag = _validate_tag(container_tag)
@@ -206,9 +278,55 @@ class MemoryEngine:
         qvec = self._embed([query])[0]
         return [
             {"type": "chunk", "id": rows[i]["id"], "document_id": rows[i]["document_id"],
-             "text": rows[i]["text"], "score": round(sim, 4), "created_at": rows[i]["created_at"]}
+             "text": rows[i]["text"], "score": round(sim, 4), "similarity": round(sim, 4),
+             "created_at": rows[i]["created_at"]}
             for i, sim in cosine_top_k(qvec, matrix, limit)
         ]
+
+    def profile(self, container_tag: str, q: str | None = None, limit: int = 5,
+                time_offset_hours: float = 0.0) -> dict:
+        """Static facts, recent dynamic facts and (optionally) memory search results for `q`."""
+        tag = _validate_tag(container_tag)
+        rows = self._current_memory_rows(tag, self.now(time_offset_hours))
+        static = [r["text"] for r in rows if r["kind"] == "static"]
+        dynamic = [r["text"] for r in reversed(rows) if r["kind"] == "dynamic"][:DYNAMIC_PROFILE_LIMIT]
+        result = {"container_tag": tag, "static": static, "dynamic": dynamic}
+        if q and q.strip():
+            result["search_results"] = self.search(q, tag, "memories", limit, time_offset_hours)
+        return result
+
+    # -------------------------------------------------------------- forgetting
+    def forget(self, container_tag: str, memory_id: str | None = None, content: str | None = None,
+               time_offset_hours: float = 0.0) -> dict | None:
+        """Explicitly forget a memory, by id or by the closest match to `content`.
+
+        Forgotten memories are kept (soft delete) but never returned by search/profile.
+        Returns the forgotten memory, or None if nothing matched.
+        """
+        tag = _validate_tag(container_tag)
+        now_ts = self.now(time_offset_hours)
+        if memory_id is None:
+            if not (content or "").strip():
+                raise ValueError("pass either memory_id or content")
+            hits = [h for h in self.search(content, tag, "memories", 1, time_offset_hours)
+                    if h["similarity"] >= FORGET_MIN_SIMILARITY]
+            if not hits:
+                return None
+            memory_id = hits[0]["id"]
+        with self._lock, self.conn:
+            cur = self.conn.execute(
+                "UPDATE memories SET forgotten_at = ?, updated_at = ? WHERE id = ? AND container_tag = ?"
+                " AND forgotten_at IS NULL", (now_ts, now_ts, memory_id, tag)
+            )
+            if cur.rowcount == 0:
+                return None
+            row = self.conn.execute("SELECT * FROM memories WHERE id = ?", (memory_id,)).fetchone()
+            self.conn.execute(
+                "INSERT INTO link_log (container_tag, fact, decision, memory_id, target_ids, reason, created_at)"
+                " VALUES (?,?,'FORGET',?, '[]', 'Explicitly forgotten', ?)", (tag, row["text"], memory_id, now_ts)
+            )
+        log.info("Forgot memory %s in '%s'", memory_id, tag)
+        return self._memory_dict(row)
 
     # ------------------------------------------------------------ inspection
     def list_documents(self, container_tag: str) -> list[dict]:

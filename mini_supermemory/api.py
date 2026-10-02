@@ -51,13 +51,31 @@ class AddRequest(BaseModel):
     container_tag: str = Field(..., examples=["khan"])
     metadata: dict = Field(default_factory=dict)
     time_offset_hours: float = Field(0.0, description="Pretend the content arrives this many hours from now.")
+    extract: bool = Field(True, description="Extract and link memories (needs the LLM).")
+
+
+TimeOffset = Field(0.0, description="Simulated time: pretend it is this many hours from now (expiry demos).")
 
 
 class SearchRequest(BaseModel):
     q: str = Field(..., examples=["What sneakers should I buy?"])
     container_tag: str = Field(..., examples=["khan"])
-    mode: Literal["documents"] = "documents"
+    mode: Literal["memories", "documents", "hybrid"] = "memories"
     limit: int = Field(5, ge=1, le=50)
+    time_offset_hours: float = TimeOffset
+
+
+class ProfileRequest(BaseModel):
+    container_tag: str = Field(..., examples=["khan"])
+    q: str | None = Field(None, examples=["What sneakers should I buy?"])
+    limit: int = Field(5, ge=1, le=50)
+    time_offset_hours: float = TimeOffset
+
+
+class ForgetRequest(BaseModel):
+    container_tag: str = Field(..., examples=["khan"])
+    memory_id: str | None = None
+    content: str | None = Field(None, description="Forget the memory that best matches this text.")
 
 
 # --------------------------------------------------------------- endpoints
@@ -74,14 +92,48 @@ def health() -> dict:
 
 @app.post("/v1/add", tags=["memory"])
 def add(req: AddRequest) -> dict:
-    """Store content under a container tag (chunked + embedded for retrieval)."""
-    return get_engine().add(req.content, req.container_tag, req.metadata, req.time_offset_hours)
+    """Store content under a container tag; extract facts and link them to existing memories."""
+    return get_engine().add(req.content, req.container_tag, req.metadata, req.time_offset_hours, req.extract)
 
 
 @app.post("/v1/search", tags=["memory"])
 def search(req: SearchRequest) -> dict:
-    results = get_engine().search_documents(req.q, req.container_tag, req.limit)
+    """Search memories (hybrid, current only), documents (naive RAG baseline) or both."""
+    results = get_engine().search(req.q, req.container_tag, req.mode, req.limit, req.time_offset_hours)
     return {"mode": req.mode, "results": results}
+
+
+@app.post("/v1/profile", tags=["memory"])
+def profile(req: ProfileRequest) -> dict:
+    """Static facts + recent dynamic facts (+ search results when `q` is given)."""
+    return get_engine().profile(req.container_tag, req.q, req.limit, req.time_offset_hours)
+
+
+@app.post("/v1/forget", tags=["memory"])
+def forget(req: ForgetRequest) -> dict:
+    """Forget a memory by id, or the memory that best matches `content`."""
+    forgotten = get_engine().forget(req.container_tag, req.memory_id, req.content)
+    if forgotten is None:
+        raise HTTPException(404, "No matching current memory found.")
+    return {"forgotten": forgotten}
+
+
+@app.get("/v1/containers/{container_tag}/memories", tags=["inspect"])
+def list_memories(container_tag: str, include_outdated: bool = True, time_offset_hours: float = 0.0) -> list[dict]:
+    """All memories with their status: current / outdated / expired / forgotten."""
+    return get_engine().list_memories(container_tag, include_outdated, time_offset_hours)
+
+
+@app.get("/v1/containers/{container_tag}/graph", tags=["inspect"])
+def graph(container_tag: str, time_offset_hours: float = 0.0) -> dict:
+    """Memory nodes and UPDATES / EXTENDS edges."""
+    return get_engine().graph(container_tag, time_offset_hours)
+
+
+@app.get("/v1/containers/{container_tag}/log", tags=["inspect"])
+def link_log(container_tag: str, limit: int = 100) -> list[dict]:
+    """Recent linking decisions (NEW / UPDATES / EXTENDS / DUPLICATE / FORGET)."""
+    return get_engine().link_log(container_tag, limit)
 
 
 @app.get("/v1/containers/{container_tag}/documents", tags=["inspect"])
