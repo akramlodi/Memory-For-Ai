@@ -1,21 +1,26 @@
 """REST API: a thin FastAPI layer over the memory engine.
 
-Interactive docs: http://127.0.0.1:8000/docs
+Web UI: http://127.0.0.1:8000/  ·  interactive docs: http://127.0.0.1:8000/docs
 """
 
 from __future__ import annotations
 
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from . import __version__
 from .config import ConfigError, load_settings
 from .engine import MemoryEngine
 from .llm import LLMError
+from .sample_data import SAMPLE_MESSAGES
+
+WEB_DIR = Path(__file__).with_name("web")
 
 settings = load_settings()
 app = FastAPI(
@@ -23,6 +28,15 @@ app = FastAPI(
     version=__version__,
     description="A small, local memory layer for AI apps (inspired by, not affiliated with, Supermemory).",
 )
+
+
+app.mount("/static", StaticFiles(directory=WEB_DIR), name="static")
+
+
+@app.get("/", include_in_schema=False)
+def web_ui() -> FileResponse:
+    """The terminal-style demo UI (a static page that calls this API)."""
+    return FileResponse(WEB_DIR / "index.html")
 
 
 @lru_cache(maxsize=1)
@@ -142,6 +156,26 @@ def list_memories(container_tag: str, include_outdated: bool = True, time_offset
 def graph(container_tag: str, time_offset_hours: float = 0.0) -> dict:
     """Memory nodes and UPDATES / EXTENDS edges."""
     return get_engine().graph(container_tag, time_offset_hours)
+
+
+@app.get("/v1/containers/{container_tag}/context", tags=["memory"])
+def context(container_tag: str, time_offset_hours: float = 0.0) -> dict:
+    """The full profile as a ready-to-inject prompt block (what the MCP `context` tool returns)."""
+    return {"container_tag": container_tag, "context": get_engine().context_prompt(container_tag, time_offset_hours)}
+
+
+@app.get("/v1/sample-data", tags=["meta"])
+def sample_data() -> list[str]:
+    """The demo conversation used by the UI's "Load sample" button."""
+    return SAMPLE_MESSAGES
+
+
+@app.get("/v1/eval/results", tags=["meta"])
+def eval_results() -> list[dict]:
+    """Saved evaluation results (newest first), as written by `mini-sm eval`."""
+    from .evaluation import load_results
+
+    return load_results()
 
 
 @app.get("/v1/containers/{container_tag}/log", tags=["inspect"])
