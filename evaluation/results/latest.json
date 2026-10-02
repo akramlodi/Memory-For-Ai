@@ -1,0 +1,1813 @@
+{
+ "label": "latest",
+ "created_at": "2026-10-02T04:52:59+00:00",
+ "provider": "azure",
+ "model": "gpt-4o",
+ "embedding": "BAAI/bge-small-en-v1.5",
+ "k": 3,
+ "n_scenarios": 25,
+ "seconds": 128.8,
+ "summary": {
+  "knowledge_update": {
+   "n": 11,
+   "rag": {
+    "recall_at_k": 1.0,
+    "stale_rate": 1.0
+   },
+   "memory": {
+    "recall_at_k": 1.0,
+    "stale_rate": 0.273
+   },
+   "hybrid": {
+    "recall_at_k": 0.909,
+    "stale_rate": 0.818
+   }
+  },
+  "extension": {
+   "n": 7,
+   "rag": {
+    "recall_at_k": 0.929,
+    "stale_rate": null
+   },
+   "memory": {
+    "recall_at_k": 0.964,
+    "stale_rate": null
+   },
+   "hybrid": {
+    "recall_at_k": 0.583,
+    "stale_rate": null
+   }
+  },
+  "expiry": {
+   "n": 7,
+   "rag": {
+    "recall_at_k": 1.0,
+    "stale_rate": 1.0
+   },
+   "memory": {
+    "recall_at_k": 1.0,
+    "stale_rate": 0.0
+   },
+   "hybrid": {
+    "recall_at_k": 1.0,
+    "stale_rate": 0.429
+   }
+  },
+  "overall": {
+   "n": 25,
+   "rag": {
+    "recall_at_k": 0.979,
+    "stale_rate": 1.0
+   },
+   "memory": {
+    "recall_at_k": 0.99,
+    "stale_rate": 0.167
+   },
+   "hybrid": {
+    "recall_at_k": 0.837,
+    "stale_rate": 0.667
+   }
+  }
+ },
+ "scenarios": [
+  {
+   "id": "upd-sneakers",
+   "category": "knowledge_update",
+   "question": "What sneakers should I buy?",
+   "stale_keywords": [
+    "adidas"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I love Adidas sneakers",
+     "My Adidas broke after a month"
+    ],
+    "top_k": [
+     "I love Adidas sneakers",
+     "My Adidas broke after a month",
+     "I'm switching to Puma"
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "User's Adidas sneakers broke after a month."
+    ],
+    "top_k": [
+     "User's Adidas sneakers broke after a month.",
+     "User is switching to Puma.",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "User's Adidas sneakers broke after a month.",
+     "I love Adidas sneakers"
+    ],
+    "top_k": [
+     "User's Adidas sneakers broke after a month.",
+     "I love Adidas sneakers",
+     "User is switching to Puma."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User is switching to Puma.",
+     "status": "current"
+    },
+    {
+     "text": "User's Adidas sneakers broke after a month.",
+     "status": "current"
+    },
+    {
+     "text": "User loves Adidas sneakers.",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-city",
+   "category": "knowledge_update",
+   "question": "Which city does the user live in?",
+   "stale_keywords": [
+    "chicago"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I live in Chicago"
+    ],
+    "top_k": [
+     "I live in Chicago",
+     "I just moved to Seattle for a new job",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User just moved to Seattle for a new job.",
+     "User is learning Spanish on Duolingo.",
+     "User's favourite cuisine is Thai food."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I live in Chicago"
+    ],
+    "top_k": [
+     "I live in Chicago",
+     "User just moved to Seattle for a new job.",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User just moved to Seattle for a new job.",
+     "status": "current"
+    },
+    {
+     "text": "User lives in Chicago",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-job",
+   "category": "knowledge_update",
+   "question": "What does the user do for a living?",
+   "stale_keywords": [
+    "teach",
+    "lincoln"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I work as a teacher at Lincoln High School"
+    ],
+    "top_k": [
+     "I left that job and now work as a UX designer at Figma",
+     "I work as a teacher at Lincoln High School",
+     "I play the guitar on weekends."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User works as a UX designer at Figma.",
+     "User plays the guitar on weekends.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User works as a UX designer at Figma.",
+     "I left that job and now work as a UX designer at Figma",
+     "User plays the guitar on weekends."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User works as a UX designer at Figma.",
+     "status": "current"
+    },
+    {
+     "text": "User works as a teacher at Lincoln High School",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-diet",
+   "category": "knowledge_update",
+   "question": "Can you suggest a dinner recipe for me?",
+   "stale_keywords": [
+    "steak"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I eat steak almost every day"
+    ],
+    "top_k": [
+     "I went vegetarian last month",
+     "My favourite cuisine is Thai food.",
+     "I eat steak almost every day"
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User's favourite cuisine is Thai food.",
+     "User went vegetarian in September 2026.",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User's favourite cuisine is Thai food.",
+     "I went vegetarian last month",
+     "User went vegetarian in September 2026."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User went vegetarian in September 2026.",
+     "status": "current"
+    },
+    {
+     "text": "User eats steak almost every day.",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-phone",
+   "category": "knowledge_update",
+   "question": "Which phone should I buy a case for?",
+   "stale_keywords": [
+    "iphone"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I use an iPhone 12"
+    ],
+    "top_k": [
+     "I use an iPhone 12",
+     "I replaced my old phone with a Google Pixel 8",
+     "I have a golden retriever named Max."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User replaced their old phone with a Google Pixel 8.",
+     "User plays the guitar on weekends.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I use an iPhone 12"
+    ],
+    "top_k": [
+     "User replaced their old phone with a Google Pixel 8.",
+     "I replaced my old phone with a Google Pixel 8",
+     "I use an iPhone 12"
+    ]
+   },
+   "memories": [
+    {
+     "text": "User replaced their old phone with a Google Pixel 8.",
+     "status": "current"
+    },
+    {
+     "text": "User uses an iPhone 12.",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-editor",
+   "category": "knowledge_update",
+   "question": "Which editor should I write a plugin for?",
+   "stale_keywords": [
+    "vim"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "My main code editor is Vim"
+    ],
+    "top_k": [
+     "My main code editor is Vim",
+     "These days I do all my coding in VS Code",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User currently does all their coding in VS Code.",
+     "User is learning Spanish on Duolingo.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "My main code editor is Vim"
+    ],
+    "top_k": [
+     "My main code editor is Vim",
+     "User currently does all their coding in VS Code.",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User currently does all their coding in VS Code.",
+     "status": "current"
+    },
+    {
+     "text": "User's main code editor is Vim",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-commute",
+   "category": "knowledge_update",
+   "question": "How does the user get to work?",
+   "stale_keywords": [
+    "honda",
+    "civic",
+    "drive"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I drive a Honda Civic to work"
+    ],
+    "top_k": [
+     "I drive a Honda Civic to work",
+     "I'm learning Spanish on Duolingo.",
+     "I sold my car and now commute by bike"
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User now commutes by bike.",
+     "User is learning Spanish on Duolingo.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I drive a Honda Civic to work"
+    ],
+    "top_k": [
+     "I drive a Honda Civic to work",
+     "User now commutes by bike.",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User sold their Honda Civic.",
+     "status": "current"
+    },
+    {
+     "text": "User now commutes by bike.",
+     "status": "current"
+    },
+    {
+     "text": "User drives a Honda Civic to work.",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-manager",
+   "category": "knowledge_update",
+   "question": "Who is the user's manager?",
+   "stale_keywords": [
+    "sarah"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "My manager is Sarah"
+    ],
+    "top_k": [
+     "My manager is Sarah",
+     "Sarah left the company, my new manager is David",
+     "I have a golden retriever named Max."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "User's previous manager, Sarah, left the company."
+    ],
+    "top_k": [
+     "User's new manager is David.",
+     "User's previous manager, Sarah, left the company.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "My manager is Sarah",
+     "User's previous manager, Sarah, left the company."
+    ],
+    "top_k": [
+     "User's new manager is David.",
+     "My manager is Sarah",
+     "User's previous manager, Sarah, left the company."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User's new manager is David.",
+     "status": "current"
+    },
+    {
+     "text": "User's previous manager, Sarah, left the company.",
+     "status": "current"
+    },
+    {
+     "text": "User's manager is Sarah.",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-coffee",
+   "category": "knowledge_update",
+   "question": "What drink should I bring the user?",
+   "stale_keywords": [
+    "coffee"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I drink three cups of coffee a day"
+    ],
+    "top_k": [
+     "I gave up caffeine and switched to herbal tea",
+     "I drink three cups of coffee a day",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User has given up caffeine and switched to herbal tea.",
+     "User's favourite cuisine is Thai food.",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I drink three cups of coffee a day"
+    ],
+    "top_k": [
+     "I drink three cups of coffee a day",
+     "User has given up caffeine and switched to herbal tea.",
+     "I gave up caffeine and switched to herbal tea"
+    ]
+   },
+   "memories": [
+    {
+     "text": "User has given up caffeine and switched to herbal tea.",
+     "status": "current"
+    },
+    {
+     "text": "User drinks three cups of coffee a day.",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-exercise",
+   "category": "knowledge_update",
+   "question": "What exercise does the user do?",
+   "stale_keywords": [
+    "gym"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I go to the gym every morning"
+    ],
+    "top_k": [
+     "I go to the gym every morning",
+     "I cancelled my gym membership, I swim at the community pool now",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "User cancelled their gym membership."
+    ],
+    "top_k": [
+     "User cancelled their gym membership.",
+     "User is learning Spanish on Duolingo.",
+     "User swims at the community pool."
+    ]
+   },
+   "hybrid": {
+    "recall": 0.0,
+    "stale": true,
+    "stale_items": [
+     "User cancelled their gym membership.",
+     "I go to the gym every morning"
+    ],
+    "top_k": [
+     "User cancelled their gym membership.",
+     "I go to the gym every morning",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User swims at the community pool.",
+     "status": "current"
+    },
+    {
+     "text": "User cancelled their gym membership.",
+     "status": "current"
+    },
+    {
+     "text": "User goes to the gym every morning.",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "upd-budget",
+   "category": "knowledge_update",
+   "question": "How much can the user spend on a laptop?",
+   "stale_keywords": [
+    "1000",
+    "1,000"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "My budget for a new laptop is $1000"
+    ],
+    "top_k": [
+     "I can now spend up to $2000 on the laptop",
+     "My budget for a new laptop is $1000",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User's budget for a new laptop is now $2000.",
+     "User is learning Spanish on Duolingo.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "My budget for a new laptop is $1000"
+    ],
+    "top_k": [
+     "User's budget for a new laptop is now $2000.",
+     "I can now spend up to $2000 on the laptop",
+     "My budget for a new laptop is $1000"
+    ]
+   },
+   "memories": [
+    {
+     "text": "User's budget for a new laptop is now $2000.",
+     "status": "current"
+    },
+    {
+     "text": "User's budget for a new laptop is $1000.",
+     "status": "outdated"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "ext-work",
+   "category": "extension",
+   "question": "Tell me about the user's job.",
+   "stale_keywords": [],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I'm a backend engineer and mostly write Rust",
+     "I work at Acme Corp",
+     "At Acme I'm on the payments team"
+    ]
+   },
+   "memory": {
+    "recall": 0.75,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User is a backend engineer.",
+     "User works at Acme Corp",
+     "User mostly writes Rust."
+    ]
+   },
+   "hybrid": {
+    "recall": 0.75,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User is a backend engineer.",
+     "I'm a backend engineer and mostly write Rust",
+     "User works at Acme Corp"
+    ]
+   },
+   "memories": [
+    {
+     "text": "User is a backend engineer.",
+     "status": "current"
+    },
+    {
+     "text": "User mostly writes Rust.",
+     "status": "current"
+    },
+    {
+     "text": "User is on the payments team at Acme Corp.",
+     "status": "current"
+    },
+    {
+     "text": "User works at Acme Corp",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "ext-trip",
+   "category": "extension",
+   "question": "What are the user's travel plans?",
+   "stale_keywords": [],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I'm planning a trip to Japan",
+     "In Japan I want to visit Kyoto and Osaka",
+     "The Japan trip is in April"
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User's trip to Japan is planned for April.",
+     "User is planning a trip to Japan.",
+     "User wants to visit Kyoto during their trip to Japan."
+    ]
+   },
+   "hybrid": {
+    "recall": 0.6666666666666666,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I'm planning a trip to Japan",
+     "User's trip to Japan is planned for April.",
+     "User is planning a trip to Japan."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User wants to visit Kyoto during their trip to Japan.",
+     "status": "current"
+    },
+    {
+     "text": "User wants to visit Osaka during their trip to Japan.",
+     "status": "current"
+    },
+    {
+     "text": "User's trip to Japan is planned for April.",
+     "status": "current"
+    },
+    {
+     "text": "User is planning a trip to Japan.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favorite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "ext-allergy",
+   "category": "extension",
+   "question": "What should I avoid when cooking for the user?",
+   "stale_keywords": [],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I'm allergic to nuts",
+     "Specifically, peanuts and cashews give me hives",
+     "My favourite cuisine is Thai food."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User is allergic to nuts.",
+     "User is allergic to peanuts.",
+     "User is allergic to cashews."
+    ]
+   },
+   "hybrid": {
+    "recall": 0.5,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User is allergic to nuts.",
+     "I'm allergic to nuts",
+     "User is allergic to peanuts."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User is allergic to peanuts.",
+     "status": "current"
+    },
+    {
+     "text": "User is allergic to cashews.",
+     "status": "current"
+    },
+    {
+     "text": "User is allergic to nuts.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "ext-sister",
+   "category": "extension",
+   "question": "What do you know about the user's sister?",
+   "stale_keywords": [],
+   "errors": [],
+   "rag": {
+    "recall": 0.5,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I have a sister named Priya",
+     "Priya's birthday is on June 3rd",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User has a sister named Priya.",
+     "User's sister Priya's birthday is on June 3rd.",
+     "User's sister Priya is a doctor in Toronto."
+    ]
+   },
+   "hybrid": {
+    "recall": 0.5,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User has a sister named Priya.",
+     "I have a sister named Priya",
+     "User's sister Priya's birthday is on June 3rd."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User's sister Priya's birthday is on June 3rd.",
+     "status": "current"
+    },
+    {
+     "text": "User's sister Priya is a doctor in Toronto.",
+     "status": "current"
+    },
+    {
+     "text": "User has a sister named Priya.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "ext-app",
+   "category": "extension",
+   "question": "What is the user building?",
+   "stale_keywords": [],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I'm building a mobile app",
+     "I'm building it with Flutter",
+     "The app is a habit tracker for students"
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User is building a mobile app.",
+     "User is building their habit tracker app with Flutter.",
+     "User is building a habit tracker app for students."
+    ]
+   },
+   "hybrid": {
+    "recall": 0.3333333333333333,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User is building a mobile app.",
+     "I'm building a mobile app",
+     "I'm building it with Flutter"
+    ]
+   },
+   "memories": [
+    {
+     "text": "User is building their habit tracker app with Flutter.",
+     "status": "current"
+    },
+    {
+     "text": "User is building a habit tracker app for students.",
+     "status": "current"
+    },
+    {
+     "text": "User is building a mobile app.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "ext-music",
+   "category": "extension",
+   "question": "Recommend an album the user would like.",
+   "stale_keywords": [],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I collect jazz records on vinyl",
+     "I love jazz",
+     "Especially John Coltrane and Miles Davis"
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User collects jazz records on vinyl.",
+     "User loves jazz.",
+     "User especially loves the jazz music of John Coltrane and Miles Davis."
+    ]
+   },
+   "hybrid": {
+    "recall": 0.6666666666666666,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User collects jazz records on vinyl.",
+     "I collect jazz records on vinyl",
+     "User loves jazz."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User collects jazz records on vinyl.",
+     "status": "current"
+    },
+    {
+     "text": "User especially loves the jazz music of John Coltrane and Miles Davis.",
+     "status": "current"
+    },
+    {
+     "text": "User loves jazz.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "ext-kitchen",
+   "category": "extension",
+   "question": "What do you know about the user's renovation?",
+   "stale_keywords": [],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I'm renovating my kitchen",
+     "The renovation budget is $30k",
+     "The new kitchen will have white oak cabinets"
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User's renovation budget is $30k.",
+     "User is renovating their kitchen.",
+     "User's new kitchen will have white oak cabinets."
+    ]
+   },
+   "hybrid": {
+    "recall": 0.6666666666666666,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "I'm renovating my kitchen",
+     "User's renovation budget is $30k.",
+     "User is renovating their kitchen."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User's renovation budget is $30k.",
+     "status": "current"
+    },
+    {
+     "text": "User's new kitchen will have white oak cabinets.",
+     "status": "current"
+    },
+    {
+     "text": "User is renovating their kitchen.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "exp-exam",
+   "category": "expiry",
+   "question": "What's going on with the user's studies?",
+   "stale_keywords": [
+    "exam"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I have an exam tomorrow"
+    ],
+    "top_k": [
+     "I have an exam tomorrow",
+     "I study biology at UCLA",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User studies biology at UCLA",
+     "User is learning Spanish on Duolingo.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I have an exam tomorrow"
+    ],
+    "top_k": [
+     "User studies biology at UCLA",
+     "I study biology at UCLA",
+     "I have an exam tomorrow"
+    ]
+   },
+   "memories": [
+    {
+     "text": "User has an exam on Saturday, 2026-10-03.",
+     "status": "expired"
+    },
+    {
+     "text": "User studies biology at UCLA",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "exp-tokyo",
+   "category": "expiry",
+   "question": "Where is the user right now?",
+   "stale_keywords": [
+    "tokyo",
+    "conference"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I'm in Tokyo this week for a conference"
+    ],
+    "top_k": [
+     "I live in Berlin",
+     "I'm in Tokyo this week for a conference",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User lives in Berlin",
+     "User is learning Spanish on Duolingo.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User lives in Berlin",
+     "I live in Berlin",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User is in Tokyo this week for a conference.",
+     "status": "expired"
+    },
+    {
+     "text": "User lives in Berlin",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "exp-dentist",
+   "category": "expiry",
+   "question": "Does the user have any appointments coming up?",
+   "stale_keywords": [
+    "dentist"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": null,
+    "stale": true,
+    "stale_items": [
+     "I have a dentist appointment this afternoon"
+    ],
+    "top_k": [
+     "I have a dentist appointment this afternoon",
+     "I'm learning Spanish on Duolingo.",
+     "I have a golden retriever named Max."
+    ]
+   },
+   "memory": {
+    "recall": null,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User has a golden retriever named Max.",
+     "User is learning Spanish on Duolingo.",
+     "User plays the guitar on weekends."
+    ]
+   },
+   "hybrid": {
+    "recall": null,
+    "stale": true,
+    "stale_items": [
+     "I have a dentist appointment this afternoon"
+    ],
+    "top_k": [
+     "I have a dentist appointment this afternoon",
+     "User has a golden retriever named Max.",
+     "User is learning Spanish on Duolingo."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User has a dentist appointment on Friday, 2026-10-02, in the afternoon.",
+     "status": "expired"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "exp-flu",
+   "category": "expiry",
+   "question": "Is the user working from home or the office?",
+   "stale_keywords": [
+    "flu"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I have the flu today so I'm staying home"
+    ],
+    "top_k": [
+     "I usually work from the office",
+     "I have the flu today so I'm staying home",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User usually works from the office.",
+     "User is learning Spanish on Duolingo.",
+     "User plays the guitar on weekends."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I have the flu today so I'm staying home"
+    ],
+    "top_k": [
+     "User usually works from the office.",
+     "I usually work from the office",
+     "I have the flu today so I'm staying home"
+    ]
+   },
+   "memories": [
+    {
+     "text": "User has the flu.",
+     "status": "expired"
+    },
+    {
+     "text": "User is staying home today.",
+     "status": "expired"
+    },
+    {
+     "text": "User usually works from the office.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "exp-guests",
+   "category": "expiry",
+   "question": "Who is staying at the user's place?",
+   "stale_keywords": [
+    "parent"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "My parents are visiting this weekend"
+    ],
+    "top_k": [
+     "I live with my roommate Alex",
+     "My parents are visiting this weekend",
+     "I'm learning Spanish on Duolingo."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User lives with their roommate Alex.",
+     "User has a golden retriever named Max.",
+     "User's favourite cuisine is Thai food."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User lives with their roommate Alex.",
+     "I live with my roommate Alex",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User's parents are visiting this weekend.",
+     "status": "expired"
+    },
+    {
+     "text": "User lives with their roommate Alex.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "exp-report",
+   "category": "expiry",
+   "question": "What is the user busy with at work?",
+   "stale_keywords": [
+    "report"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I have a big report due tomorrow morning"
+    ],
+    "top_k": [
+     "I work in marketing",
+     "I have a big report due tomorrow morning",
+     "I play the guitar on weekends."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User works in marketing",
+     "User plays the guitar on weekends.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User works in marketing",
+     "I work in marketing",
+     "User plays the guitar on weekends."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User has a big report due on Saturday morning, 2026-10-03.",
+     "status": "expired"
+    },
+    {
+     "text": "User works in marketing",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  },
+  {
+   "id": "exp-vacation",
+   "category": "expiry",
+   "question": "Is the user available for work shifts?",
+   "stale_keywords": [
+    "bali",
+    "vacation"
+   ],
+   "errors": [],
+   "rag": {
+    "recall": 1.0,
+    "stale": true,
+    "stale_items": [
+     "I'm on vacation in Bali until Friday"
+    ],
+    "top_k": [
+     "I work as a nurse",
+     "I'm on vacation in Bali until Friday",
+     "I play the guitar on weekends."
+    ]
+   },
+   "memory": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User works as a nurse.",
+     "User plays the guitar on weekends.",
+     "User has a golden retriever named Max."
+    ]
+   },
+   "hybrid": {
+    "recall": 1.0,
+    "stale": false,
+    "stale_items": [],
+    "top_k": [
+     "User works as a nurse.",
+     "I work as a nurse",
+     "User plays the guitar on weekends."
+    ]
+   },
+   "memories": [
+    {
+     "text": "User is on vacation in Bali.",
+     "status": "expired"
+    },
+    {
+     "text": "User works as a nurse.",
+     "status": "current"
+    },
+    {
+     "text": "User is learning Spanish on Duolingo.",
+     "status": "current"
+    },
+    {
+     "text": "User plays the guitar on weekends.",
+     "status": "current"
+    },
+    {
+     "text": "User's favourite cuisine is Thai food.",
+     "status": "current"
+    },
+    {
+     "text": "User has a golden retriever named Max.",
+     "status": "current"
+    }
+   ]
+  }
+ ]
+}

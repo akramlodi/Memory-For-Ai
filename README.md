@@ -119,6 +119,20 @@ python -m venv .venv && source .venv/bin/activate      # Windows: .venv\Scripts\
 pip install -e ".[dev]"
 ```
 
+<details>
+<summary><b>macOS: <code>ModuleNotFoundError: No module named 'mini_supermemory'</code> after installing</b></summary>
+
+Python 3.13+ ignores `.pth` files that have the macOS "hidden" flag, and the editable install
+relies on one. Clear the flag and the command works again (re-run it after any reinstall):
+
+```bash
+chflags -R nohidden .venv
+```
+
+This tends to happen in folders synced by iCloud (e.g. `~/Desktop`, `~/Documents`); cloning
+the project elsewhere avoids it.
+</details>
+
 ### Configure
 
 ```bash
@@ -328,15 +342,47 @@ displays them.
 
 ### Results
 
-> **Honesty note.** The development environment for this repo had no LLM API key, and its
-> network blocked the embedding-model download. So the only numbers produced so far come from
-> `mini-sm eval --offline`. That mode swaps the LLM for a **rule-based stand-in** (sentence
-> splitting, keyword cues, word overlap) and uses the **hash embedder**. These numbers check
-> that the pipeline works end to end; they are **not** a measure of what the system does with a
-> real LLM. Run `mini-sm eval` with your provider to get real numbers. The run writes
-> `evaluation/results/latest.md`, which you can paste below.
+**Real run:** Azure AI Foundry `gpt-4o`, `BAAI/bge-small-en-v1.5` embeddings, k = 3,
+25 scenarios, about 2 minutes (full output in
+[`evaluation/results/latest.md`](evaluation/results/latest.md)).
 
-**Offline pipeline check** (rule-based stand-in, hash embeddings, k = 3, 25 scenarios):
+| Category | n | RAG Recall@3 | Memory Recall@3 | Hybrid Recall@3 | RAG stale rate | Memory stale rate | Hybrid stale rate |
+|---|---|---|---|---|---|---|---|
+| knowledge_update | 11 | 100% | 100% | 91% | 100% | 27% | 82% |
+| extension | 7 | 93% | 96% | 58% | n/a | n/a | n/a |
+| expiry | 7 | 100% | 100% | 100% | 100% | 0% | 43% |
+| **overall** | 25 | 98% | **99%** | 84% | 100% | **17%** | 67% |
+
+**What the numbers show:**
+
+- **Memory matches RAG on recall and cuts stale facts from 100% to 17%.** RAG finds the right
+  text every time, but it also returns the outdated version every time. That is the gap this
+  project is about.
+- **Expiry: 0% stale.** "Exam tomorrow" or "in Tokyo this week" are filtered out at query time
+  once they expire. RAG has no notion of time.
+- **Updates: the LLM judge caught all 11.** In every `knowledge_update` scenario the old fact
+  was marked outdated, including "switching to Puma" vs "loves Adidas", which share no words.
+- **The remaining 27% on updates is mostly the metric being strict.** The three flagged
+  memories describe the change rather than restate the old fact: "User's Adidas sneakers
+  broke after a month", "User's previous manager, Sarah, left the company", "User cancelled
+  their gym membership". They mention the old keyword without an expected one, so the keyword
+  check counts them as stale. Judged by hand, none of them is outdated.
+- **Extension misses are partly a ceiling.** `ext-work` expects 4 separate facts and k = 3
+  only returns 3 items, so 75% was the best possible score.
+- **Hybrid mode is the weak spot at k = 3.** Raw chunks, including stale ones ("I live in
+  Chicago"), compete with memories for the same three slots. In `upd-exercise` the raw "I go
+  to the gym every morning" pushed out "User swims at the community pool", so hybrid recall
+  was 0.
+
+A full run makes roughly 300–350 LLM calls (extraction plus relation judging for 156
+messages); `--limit` and `--category` run a subset.
+
+<details>
+<summary><b>Offline pipeline check</b> (rule-based stand-in, no LLM)</summary>
+
+`mini-sm eval --offline` swaps the LLM for a **rule-based stand-in** (sentence splitting,
+keyword cues, word overlap) and uses the **hash embedder**. It checks that the pipeline works
+end to end without a key or downloads; it is **not** a measure of real quality.
 
 | Category | n | RAG Recall@3 | Memory Recall@3 | Hybrid Recall@3 | RAG stale rate | Memory stale rate | Hybrid stale rate |
 |---|---|---|---|---|---|---|---|
@@ -345,24 +391,10 @@ displays them.
 | expiry | 7 | 83% | 83% | 67% | 57% | 0% | 29% |
 | **overall** | 25 | 67% | 68% | 52% | 78% | 33% | 67% |
 
-**With a real LLM + bge-small embeddings:** _not yet run. Run `mini-sm eval` and paste the
-table from `evaluation/results/latest.md` here._ A full run makes roughly 300–350 LLM calls
-(extraction plus relation judging for 156 messages); `--limit` and `--category` run a subset.
-
-**What the offline numbers show, and where it fails:**
-
-- **Expiry works by construction.** The memory stale rate is 0%, against 57% for RAG, because
-  expired facts are filtered out at query time. RAG has no notion of time.
-- **Updates only work when the judge recognises them.** The rule-based judge needs the old and
-  new facts to share a word. It catches "I left that job and now work as a UX designer" →
-  *teacher* outdated. It misses "I'm switching to Puma" vs "I love Adidas sneakers" (no shared
-  words), so the old fact stays current and the memory stale rate on updates is still 55%.
-  Closing that semantic gap is exactly the job of the LLM judge.
-- **Hash embeddings are weak.** Several failures (e.g. `ext-work`, `ext-allergy`) are pure
-  retrieval misses: the top-3 is filler ("golden retriever", "Thai food") because the question
-  shares no words with the right memory. A real embedding model should fix most of these.
-- **Hybrid mode is worse than memory-only at k = 3.** Raw chunks, including stale ones, compete
-  with memories for the same three slots.
+Compared with the real run, this shows what the LLM and embedding model contribute: the
+rule-based judge needs old and new facts to share a word, so it misses "Puma" vs "Adidas", and
+hash embeddings miss questions that share no words with the right memory.
+</details>
 
 ---
 
@@ -389,7 +421,8 @@ table from `evaluation/results/latest.md` here._ A full run makes roughly 300–
 - **Small scale by design.** Brute-force vector search and a single SQLite file are fine for
   demos, not for millions of memories.
 - **Quality depends on the LLM.** Small local models (Ollama) may mislabel relations or skip
-  expiry hints. The offline evaluation shows how much rides on the judge.
+  expiry hints. Comparing the offline and real evaluation runs shows how much rides on the
+  judge.
 - **No `DERIVES` relation, recency weighting, auth or multi-tenancy.** These are out of scope;
   see TASK.md for the stretch list.
 - **One relation per fact.** A new fact gets a single label (it can still target several
