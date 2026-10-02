@@ -1,0 +1,513 @@
+{
+ "description": "Mini-Supermemory evaluation scenarios. Each scenario's messages are added (one per simulated hour, after shared background 'filler' messages) to a fresh container; the question is asked at ask_at_hours. 'expected' is a list of facts, each a list of alternative keywords (matched at word starts, case-insensitive). 'stale' lists keywords of outdated/expired facts.",
+ "filler": [
+  "I have a golden retriever named Max.",
+  "My favourite cuisine is Thai food.",
+  "I play the guitar on weekends.",
+  "I'm learning Spanish on Duolingo."
+ ],
+ "scenarios": [
+  {
+   "id": "upd-sneakers",
+   "category": "knowledge_update",
+   "messages": [
+    "I love Adidas sneakers",
+    "My Adidas broke after a month",
+    "I'm switching to Puma"
+   ],
+   "question": "What sneakers should I buy?",
+   "ask_at_hours": 4,
+   "expected": [
+    [
+     "puma"
+    ]
+   ],
+   "stale": [
+    "adidas"
+   ]
+  },
+  {
+   "id": "upd-city",
+   "category": "knowledge_update",
+   "messages": [
+    "I live in Chicago",
+    "I just moved to Seattle for a new job"
+   ],
+   "question": "Which city does the user live in?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "seattle"
+    ]
+   ],
+   "stale": [
+    "chicago"
+   ]
+  },
+  {
+   "id": "upd-job",
+   "category": "knowledge_update",
+   "messages": [
+    "I work as a teacher at Lincoln High School",
+    "I left that job and now work as a UX designer at Figma"
+   ],
+   "question": "What does the user do for a living?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "designer",
+     "figma"
+    ]
+   ],
+   "stale": [
+    "teach",
+    "lincoln"
+   ]
+  },
+  {
+   "id": "upd-diet",
+   "category": "knowledge_update",
+   "messages": [
+    "I eat steak almost every day",
+    "I went vegetarian last month"
+   ],
+   "question": "Can you suggest a dinner recipe for me?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "vegetarian"
+    ]
+   ],
+   "stale": [
+    "steak"
+   ]
+  },
+  {
+   "id": "upd-phone",
+   "category": "knowledge_update",
+   "messages": [
+    "I use an iPhone 12",
+    "I replaced my old phone with a Google Pixel 8"
+   ],
+   "question": "Which phone should I buy a case for?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "pixel"
+    ]
+   ],
+   "stale": [
+    "iphone"
+   ]
+  },
+  {
+   "id": "upd-editor",
+   "category": "knowledge_update",
+   "messages": [
+    "My main code editor is Vim",
+    "These days I do all my coding in VS Code"
+   ],
+   "question": "Which editor should I write a plugin for?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "vs code",
+     "vscode",
+     "visual studio code"
+    ]
+   ],
+   "stale": [
+    "vim"
+   ]
+  },
+  {
+   "id": "upd-commute",
+   "category": "knowledge_update",
+   "messages": [
+    "I drive a Honda Civic to work",
+    "I sold my car and now commute by bike"
+   ],
+   "question": "How does the user get to work?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "bike",
+     "bicycle",
+     "cycl"
+    ]
+   ],
+   "stale": [
+    "honda",
+    "civic",
+    "drive"
+   ]
+  },
+  {
+   "id": "upd-manager",
+   "category": "knowledge_update",
+   "messages": [
+    "My manager is Sarah",
+    "Sarah left the company, my new manager is David"
+   ],
+   "question": "Who is the user's manager?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "david"
+    ]
+   ],
+   "stale": [
+    "sarah"
+   ]
+  },
+  {
+   "id": "upd-coffee",
+   "category": "knowledge_update",
+   "messages": [
+    "I drink three cups of coffee a day",
+    "I gave up caffeine and switched to herbal tea"
+   ],
+   "question": "What drink should I bring the user?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "herbal",
+     "tea"
+    ]
+   ],
+   "stale": [
+    "coffee"
+   ]
+  },
+  {
+   "id": "upd-exercise",
+   "category": "knowledge_update",
+   "messages": [
+    "I go to the gym every morning",
+    "I cancelled my gym membership, I swim at the community pool now"
+   ],
+   "question": "What exercise does the user do?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "swim",
+     "pool"
+    ]
+   ],
+   "stale": [
+    "gym"
+   ]
+  },
+  {
+   "id": "upd-budget",
+   "category": "knowledge_update",
+   "messages": [
+    "My budget for a new laptop is $1000",
+    "I can now spend up to $2000 on the laptop"
+   ],
+   "question": "How much can the user spend on a laptop?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "2000",
+     "2,000"
+    ]
+   ],
+   "stale": [
+    "1000",
+    "1,000"
+   ]
+  },
+  {
+   "id": "ext-work",
+   "category": "extension",
+   "messages": [
+    "I work at Acme Corp",
+    "At Acme I'm on the payments team",
+    "I'm a backend engineer and mostly write Rust"
+   ],
+   "question": "Tell me about the user's job.",
+   "ask_at_hours": 4,
+   "expected": [
+    [
+     "acme"
+    ],
+    [
+     "payment"
+    ],
+    [
+     "backend"
+    ],
+    [
+     "rust"
+    ]
+   ],
+   "stale": []
+  },
+  {
+   "id": "ext-trip",
+   "category": "extension",
+   "messages": [
+    "I'm planning a trip to Japan",
+    "The Japan trip is in April",
+    "In Japan I want to visit Kyoto and Osaka"
+   ],
+   "question": "What are the user's travel plans?",
+   "ask_at_hours": 4,
+   "expected": [
+    [
+     "japan"
+    ],
+    [
+     "april"
+    ],
+    [
+     "kyoto",
+     "osaka"
+    ]
+   ],
+   "stale": []
+  },
+  {
+   "id": "ext-allergy",
+   "category": "extension",
+   "messages": [
+    "I'm allergic to nuts",
+    "Specifically, peanuts and cashews give me hives"
+   ],
+   "question": "What should I avoid when cooking for the user?",
+   "ask_at_hours": 3,
+   "expected": [
+    [
+     "nut",
+     "peanut"
+    ],
+    [
+     "cashew"
+    ]
+   ],
+   "stale": []
+  },
+  {
+   "id": "ext-sister",
+   "category": "extension",
+   "messages": [
+    "I have a sister named Priya",
+    "Priya is a doctor in Toronto",
+    "Priya's birthday is on June 3rd"
+   ],
+   "question": "What do you know about the user's sister?",
+   "ask_at_hours": 4,
+   "expected": [
+    [
+     "priya"
+    ],
+    [
+     "doctor"
+    ],
+    [
+     "toronto"
+    ],
+    [
+     "june"
+    ]
+   ],
+   "stale": []
+  },
+  {
+   "id": "ext-app",
+   "category": "extension",
+   "messages": [
+    "I'm building a mobile app",
+    "The app is a habit tracker for students",
+    "I'm building it with Flutter"
+   ],
+   "question": "What is the user building?",
+   "ask_at_hours": 4,
+   "expected": [
+    [
+     "habit"
+    ],
+    [
+     "flutter"
+    ],
+    [
+     "student"
+    ]
+   ],
+   "stale": []
+  },
+  {
+   "id": "ext-music",
+   "category": "extension",
+   "messages": [
+    "I love jazz",
+    "Especially John Coltrane and Miles Davis",
+    "I collect jazz records on vinyl"
+   ],
+   "question": "Recommend an album the user would like.",
+   "ask_at_hours": 4,
+   "expected": [
+    [
+     "jazz"
+    ],
+    [
+     "coltrane",
+     "davis"
+    ],
+    [
+     "vinyl"
+    ]
+   ],
+   "stale": []
+  },
+  {
+   "id": "ext-kitchen",
+   "category": "extension",
+   "messages": [
+    "I'm renovating my kitchen",
+    "The new kitchen will have white oak cabinets",
+    "The renovation budget is $30k"
+   ],
+   "question": "What do you know about the user's renovation?",
+   "ask_at_hours": 4,
+   "expected": [
+    [
+     "kitchen"
+    ],
+    [
+     "oak"
+    ],
+    [
+     "30"
+    ]
+   ],
+   "stale": []
+  },
+  {
+   "id": "exp-exam",
+   "category": "expiry",
+   "messages": [
+    "I study biology at UCLA",
+    "I have an exam tomorrow"
+   ],
+   "question": "What's going on with the user's studies?",
+   "ask_at_hours": 72,
+   "expected": [
+    [
+     "biology",
+     "ucla"
+    ]
+   ],
+   "stale": [
+    "exam"
+   ]
+  },
+  {
+   "id": "exp-tokyo",
+   "category": "expiry",
+   "messages": [
+    "I live in Berlin",
+    "I'm in Tokyo this week for a conference"
+   ],
+   "question": "Where is the user right now?",
+   "ask_at_hours": 240,
+   "expected": [
+    [
+     "berlin"
+    ]
+   ],
+   "stale": [
+    "tokyo",
+    "conference"
+   ]
+  },
+  {
+   "id": "exp-dentist",
+   "category": "expiry",
+   "messages": [
+    "I have a dentist appointment this afternoon"
+   ],
+   "question": "Does the user have any appointments coming up?",
+   "ask_at_hours": 48,
+   "expected": [],
+   "stale": [
+    "dentist"
+   ]
+  },
+  {
+   "id": "exp-flu",
+   "category": "expiry",
+   "messages": [
+    "I usually work from the office",
+    "I have the flu today so I'm staying home"
+   ],
+   "question": "Is the user working from home or the office?",
+   "ask_at_hours": 240,
+   "expected": [
+    [
+     "office"
+    ]
+   ],
+   "stale": [
+    "flu"
+   ]
+  },
+  {
+   "id": "exp-guests",
+   "category": "expiry",
+   "messages": [
+    "I live with my roommate Alex",
+    "My parents are visiting this weekend"
+   ],
+   "question": "Who is staying at the user's place?",
+   "ask_at_hours": 240,
+   "expected": [
+    [
+     "alex",
+     "roommate"
+    ]
+   ],
+   "stale": [
+    "parent"
+   ]
+  },
+  {
+   "id": "exp-report",
+   "category": "expiry",
+   "messages": [
+    "I work in marketing",
+    "I have a big report due tomorrow morning"
+   ],
+   "question": "What is the user busy with at work?",
+   "ask_at_hours": 96,
+   "expected": [
+    [
+     "marketing"
+    ]
+   ],
+   "stale": [
+    "report"
+   ]
+  },
+  {
+   "id": "exp-vacation",
+   "category": "expiry",
+   "messages": [
+    "I work as a nurse",
+    "I'm on vacation in Bali until Friday"
+   ],
+   "question": "Is the user available for work shifts?",
+   "ask_at_hours": 336,
+   "expected": [
+    [
+     "nurse"
+    ]
+   ],
+   "stale": [
+    "bali",
+    "vacation"
+   ]
+  }
+ ]
+}
