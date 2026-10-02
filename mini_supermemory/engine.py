@@ -12,6 +12,7 @@ import logging
 import threading
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 
 import numpy as np
 
@@ -31,6 +32,12 @@ LINK_CANDIDATES = 5  # how many similar current memories the relation judge sees
 SEARCH_MODES = ("memories", "documents", "hybrid")
 FORGET_MIN_SIMILARITY = 0.3  # forgetting "by content" needs at least this cosine similarity
 DYNAMIC_PROFILE_LIMIT = 10
+
+CHAT_SYSTEM = """You are a helpful personal assistant. Answer the user's question using the
+context about them below. Be concise (2-4 sentences) and make a concrete recommendation when
+asked for one. If the context does not help, say so briefly and answer generally.
+
+{context}"""
 
 # SQL condition for "current" memories: latest version, not forgotten, not expired at :now.
 CURRENT = "is_latest = 1 AND forgotten_at IS NULL AND (expires_at IS NULL OR expires_at > :now)"
@@ -294,6 +301,60 @@ class MemoryEngine:
         if q and q.strip():
             result["search_results"] = self.search(q, tag, "memories", limit, time_offset_hours)
         return result
+
+    # -------------------------------------------------------------------- chat
+    def chat(self, question: str, container_tag: str, limit: int = 3, time_offset_hours: float = 0.0,
+             remember: bool = False) -> dict:
+        """Answer `question` twice — once with naive RAG context, once with memory context.
+
+        Both answers use the same prompt and model; only the context differs, so the
+        comparison isolates retrieval. Each answer is returned with the context it used.
+        If `remember`, the question is ingested afterwards (so it never sees itself).
+        """
+        tag = _validate_tag(container_tag)
+        if not (question or "").strip():
+            raise ValueError("question must be a non-empty string")
+
+        rag_hits = self.search_documents(question, tag, limit)
+        rag_context = "Relevant past messages from the user:\n" + (
+            "\n".join(f"- {h['text']}" for h in rag_hits) or "(nothing found)")
+
+        prof = self.profile(tag, question, limit, time_offset_hours)
+        memory_context = self._format_profile(prof)
+
+        def answer(context: str) -> str:
+            return self.llm.complete(CHAT_SYSTEM.format(context=context),
+                                     [{"role": "user", "content": question}],
+                                     max_tokens=4000, effort="medium")
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            rag_future, mem_future = pool.submit(answer, rag_context), pool.submit(answer, memory_context)
+            rag_answer, mem_answer = rag_future.result(), mem_future.result()
+
+        result = {
+            "question": question,
+            "rag": {"answer": rag_answer, "context": rag_hits, "prompt_context": rag_context},
+            "memory": {"answer": mem_answer, "context": prof, "prompt_context": memory_context},
+        }
+        if remember:
+            result["ingested"] = self.add(question, tag, {"source": "chat"}, time_offset_hours)
+        return result
+
+    @staticmethod
+    def _format_profile(prof: dict) -> str:
+        def bullets(items):
+            return "\n".join(f"- {t}" for t in items) or "- (none)"
+
+        seen = set(prof["static"]) | set(prof["dynamic"])
+        extra = [r["text"] for r in prof.get("search_results", []) if r["text"] not in seen]
+        return ("What you currently know about the user (outdated and expired facts are excluded):\n"
+                f"Stable facts:\n{bullets(prof['static'])}\n"
+                f"Recent context (newest first):\n{bullets(prof['dynamic'])}\n"
+                f"Other relevant memories:\n{bullets(extra)}")
+
+    def context_prompt(self, container_tag: str, time_offset_hours: float = 0.0) -> str:
+        """The full profile as a text block, ready to inject at the start of a conversation."""
+        return self._format_profile(self.profile(container_tag, time_offset_hours=time_offset_hours))
 
     # -------------------------------------------------------------- forgetting
     def forget(self, container_tag: str, memory_id: str | None = None, content: str | None = None,

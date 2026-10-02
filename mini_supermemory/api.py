@@ -78,6 +78,14 @@ class ForgetRequest(BaseModel):
     content: str | None = Field(None, description="Forget the memory that best matches this text.")
 
 
+class ChatRequest(BaseModel):
+    question: str = Field(..., examples=["What sneakers should I buy?"])
+    container_tag: str = Field(..., examples=["khan"])
+    limit: int = Field(3, ge=1, le=20, description="Context items retrieved for each mode.")
+    time_offset_hours: float = TimeOffset
+    remember: bool = Field(False, description="Also ingest the question as new content afterwards.")
+
+
 # --------------------------------------------------------------- endpoints
 @app.get("/health", tags=["meta"])
 def health() -> dict:
@@ -107,6 +115,12 @@ def search(req: SearchRequest) -> dict:
 def profile(req: ProfileRequest) -> dict:
     """Static facts + recent dynamic facts (+ search results when `q` is given)."""
     return get_engine().profile(req.container_tag, req.q, req.limit, req.time_offset_hours)
+
+
+@app.post("/v1/chat", tags=["chat"])
+def chat(req: ChatRequest) -> dict:
+    """Answer twice — naive RAG context vs. memory context — and return both with their context."""
+    return get_engine().chat(req.question, req.container_tag, req.limit, req.time_offset_hours, req.remember)
 
 
 @app.post("/v1/forget", tags=["memory"])
