@@ -59,7 +59,6 @@ class Settings:
     database_path: Path = field(default_factory=lambda: PROJECT_ROOT / "data" / "memory.db")
     api_host: str = "127.0.0.1"
     api_port: int = 8000
-    ui_port: int = 8501
     default_container_tag: str = "default"
     log_level: str = "INFO"
 
@@ -119,9 +118,8 @@ def load_settings() -> Settings:
 
     try:
         api_port = int(env("API_PORT") or 8000)
-        ui_port = int(env("UI_PORT") or 8501)
     except ValueError as exc:
-        raise ConfigError(f"API_PORT / UI_PORT must be integers ({exc}).") from exc
+        raise ConfigError(f"API_PORT must be an integer ({exc}).") from exc
 
     backend = (env("EMBEDDING_BACKEND") or "fastembed").strip().lower()
     if backend not in ("fastembed", "hash"):
@@ -141,7 +139,6 @@ def load_settings() -> Settings:
         database_path=db_path,
         api_host=env("API_HOST") or "127.0.0.1",
         api_port=api_port,
-        ui_port=ui_port,
         default_container_tag=env("DEFAULT_CONTAINER_TAG") or "default",
         log_level=(env("LOG_LEVEL") or "INFO").upper(),
     )

@@ -3,9 +3,7 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
-from pathlib import Path
 
 from .config import ConfigError, load_settings, setup_logging
 
@@ -35,31 +33,20 @@ def cmd_api(args) -> int:
     return 0
 
 
-def _streamlit_cmd(port: int) -> list[str]:
-    app = Path(__file__).with_name("ui.py")
-    return [sys.executable, "-m", "streamlit", "run", str(app), "--server.port", str(port),
-            "--browser.gatherUsageStats", "false"]
-
-
-def cmd_ui(args) -> int:
-    settings = load_settings()
-    return subprocess.call(_streamlit_cmd(settings.ui_port))
-
-
 def cmd_start(args) -> int:
-    """Run the REST API and the UI together (Ctrl+C stops both)."""
+    """Run the REST API, which also serves the web UI at /."""
+    import uvicorn
+
     settings = load_settings()
-    api = subprocess.Popen([sys.executable, "-m", "uvicorn", "mini_supermemory.api:app",
-                            "--host", settings.api_host, "--port", str(settings.api_port)])
+    print(f"Web UI   : http://{settings.api_host}:{settings.api_port}/")
     print(f"REST API : http://{settings.api_host}:{settings.api_port}/docs")
-    print(f"UI       : http://localhost:{settings.ui_port}")
-    try:
-        return subprocess.call(_streamlit_cmd(settings.ui_port))
-    except KeyboardInterrupt:
-        return 0
-    finally:
-        api.terminate()
-        api.wait(timeout=10)
+    if not args.no_browser:
+        import threading
+        import webbrowser
+
+        threading.Timer(1.5, webbrowser.open, [f"http://{settings.api_host}:{settings.api_port}/"]).start()
+    uvicorn.run("mini_supermemory.api:app", host=settings.api_host, port=settings.api_port)
+    return 0
 
 
 def cmd_mcp(args) -> int:
@@ -88,9 +75,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="mini-sm", description="Mini-Supermemory command line")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check", help="check that the configured LLM provider works").set_defaults(func=cmd_check)
-    sub.add_parser("start", help="run the REST API and the demo UI together").set_defaults(func=cmd_start)
-    sub.add_parser("ui", help="run the demo UI").set_defaults(func=cmd_ui)
-    sub.add_parser("api", help="run the REST API").set_defaults(func=cmd_api)
+    for name in ("start", "ui"):
+        sp = sub.add_parser(name, help="run the web UI + REST API (opens the browser)")
+        sp.add_argument("--no-browser", action="store_true", help="don't open a browser tab")
+        sp.set_defaults(func=cmd_start)
+    sub.add_parser("api", help="run the REST API (also serves the web UI at /)").set_defaults(func=cmd_api)
     sub.add_parser("mcp", help="run the MCP server over stdio (for Claude Desktop)").set_defaults(func=cmd_mcp)
     ev = sub.add_parser("eval", help="run the RAG-vs-memory evaluation")
     ev.add_argument("--offline", action="store_true",

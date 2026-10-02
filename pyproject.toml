@@ -18,7 +18,6 @@ dependencies = [
     "openai>=1.106",  # callable api_key (Azure Entra ID tokens)
     "fastembed>=0.4",
     "mcp>=2.2,<3",
-    "streamlit>=1.35",
 ]
 
 [project.optional-dependencies]

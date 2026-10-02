@@ -66,7 +66,7 @@ Later the user asks, **"What sneakers should I buy?"**
 
 ```mermaid
 flowchart LR
-    UI[Streamlit demo UI] --> E
+    UI[Web UI - static page,<br/>served by the API] --> API
     API[REST API - FastAPI] --> E
     MCP[MCP server - stdio] --> E
     subgraph E[Memory engine - plain Python library]
@@ -80,7 +80,7 @@ flowchart LR
 ```
 
 - `mini_supermemory/engine.py` is the **engine**. It knows nothing about HTTP, MCP or the UI.
-- `api.py`, `mcp_server.py` and `ui.py` are thin layers over the **same engine and the same
+- `api.py` and `mcp_server.py` are thin layers over the **same engine and the same
   SQLite file**, so a fact saved from Claude Desktop shows up in the UI straight away.
 
 **What happens when you add a message:**
@@ -186,15 +186,15 @@ If the configuration is wrong you get a plain explanation instead of a stack tra
 mini-sm start
 ```
 
-This starts the **UI** on http://localhost:8501 and the **REST API** on
-http://127.0.0.1:8000 (interactive docs at `/docs`). You can also run them separately with
-`mini-sm ui` / `mini-sm api`, and start the MCP server with `mini-sm mcp`.
+This starts the server on http://127.0.0.1:8000 and opens the **web UI** in your browser.
+The same server hosts the **REST API** (interactive docs at `/docs`). Add `--no-browser` to skip
+opening a tab. The MCP server runs separately: `mini-sm mcp`, and Claude Desktop launches it for you.
 
 | Command | What it does |
 |---|---|
 | `mini-sm check` | Round-trip a prompt to the configured LLM |
-| `mini-sm start` | REST API + demo UI |
-| `mini-sm ui` / `mini-sm api` | Just one of them |
+| `mini-sm start` (alias `mini-sm ui`) | Web UI + REST API, opens the browser |
+| `mini-sm api` | Same server, without opening a browser |
 | `mini-sm mcp` | MCP server over stdio (Claude Desktop launches this for you) |
 | `mini-sm eval [--offline] [--k 3]` | Run the evaluation |
 
@@ -202,32 +202,47 @@ http://127.0.0.1:8000 (interactive docs at `/docs`). You can also run them separ
 
 ## Demo walkthrough
 
+The UI is a dark, terminal-style page in the spirit of [opencode.ai](https://opencode.ai). Tabs
+across the top switch views: **chat · memories · graph · profile · search · eval · log**. Keys
+`1`–`7` also switch tabs, and `/` jumps to the chat prompt. A status sidebar on the right holds:
+
+- the **container** tag
+- the **clock**, for simulating time
+- **context** counts
+- the live **memory** list
+- options and provider info
+- **reset container**
+
 These steps follow the north-star flow from the brief. Everything happens in the UI.
 
-1. Run `mini-sm start` and open http://localhost:8501.
-2. In the sidebar, pick or type a **container tag** (e.g. `khan`).
-3. In the **💬 Chat** tab, send the following messages:
+1. Run `mini-sm start`; the browser opens http://127.0.0.1:8000/.
+2. In the sidebar under **Container**, pick or type a tag (e.g. `khan`) and press Enter.
+3. In the **chat** tab, type at the `❯` prompt:
    - `I love Adidas sneakers`
    - `My Adidas broke after a month`
    - `I'm switching to Puma`
-4. The **memory panel** on the right updates after each message. Every message shows its
-   linking decision (🆕 NEW, ➕ EXTENDS, 🔁 UPDATES, ♻️ DUPLICATE). "User loves Adidas sneakers"
-   is **struck through** as outdated, and the graph shows a red **UPDATES** edge.
-5. Ask **`What sneakers should I buy?`**. You get two answers side by side: **📄 Naive RAG**
-   and **🧠 Memory**. Open "Context used" under each one to see *why* they differ.
-   *Tip:* **Load sample data** loads a longer, Adidas-heavy history. In that history, chunk
-   similarity clearly favours the stale Adidas messages, which makes the contrast obvious.
-6. The **👤 Profile** tab shows **static** vs **dynamic** facts and has a search box with the
-   three search modes.
-7. **Forgetting:** send `I have an exam tomorrow`, then drag **⏩ Simulate time** to 72 hours.
+4. Each message gets a tree of linking decisions, like a coding agent's tool calls
+   (`NEW`, `EXTENDS` in blue, `UPDATES` in red, `DUPLICATE`). The sidebar's **Memory** list
+   updates live, and "User loves Adidas sneakers" is **struck through**. The **graph** tab draws
+   the red `UPDATES` edge.
+5. Ask **`What sneakers should I buy?`**. Two boxes appear side by side: **rag · similarity
+   only** and **memory · current facts**. Expand "context used" in each to see *why* they differ.
+   *Tip:* **⤓ Load sample** (top right) loads a longer, Adidas-heavy history. In that history,
+   chunk similarity clearly favours the stale Adidas messages, which makes the contrast obvious.
+6. The **profile** tab shows **static** vs **dynamic** facts and the exact context prompt.
+   The **search** tab runs the same query in `memories`, `documents` (RAG) or `hybrid` mode.
+7. **Forgetting:** send `I have an exam tomorrow`, then drag the **Clock** slider to `+72h`.
    The memory turns *expired* and disappears from answers, the profile and search.
+   The **memories** tab can also **forget** any current fact explicitly.
 8. **Claude Desktop:** see [below](#claude-desktop-mcp). In a brand-new chat, ask *"What do you
    know about my shoe preferences?"*. Claude calls `recall` and answers from the same store.
-9. The **📊 Evaluation** tab shows the RAG-vs-memory results table and charts.
-   **🗑️ Reset container** wipes the tag so you can start over.
+9. The **eval** tab shows the RAG-vs-memory results table with terminal-style bar charts.
+   The **log** tab lists every linking decision and the raw documents.
+   **✕ reset container** wipes the tag so you can start over.
 
-The toggles in the sidebar let you skip the side-by-side answers, which makes ingestion faster,
-and switch off remembering chat messages.
+Under **Options** in the sidebar you can skip the side-by-side answers (faster ingestion) or stop
+remembering chat messages. The chat history for each container is kept in your browser
+(localStorage); the memories themselves live in the SQLite file.
 
 ---
 
@@ -337,7 +352,7 @@ Restart Claude Desktop, and the three tools appear under the 🔧 icon.
   fact. That means an item that mentions a stale keyword and none of the expected ones, so
   "switched from Adidas to Puma" is *not* counted as stale.
 
-Results are saved to `evaluation/results/<label>.json` and `.md`, and the UI's Evaluation tab
+Results are saved to `evaluation/results/<label>.json` and `.md`, and the UI's **eval** tab
 displays them.
 
 ### Results
@@ -414,6 +429,7 @@ hash embeddings miss questions that share no words with the right memory.
 | **Same prompt and model for both chat answers** | Only the context differs, so the side-by-side isolates retrieval. |
 | **Default Anthropic model `claude-opus-5-5`, `effort: low` for extraction/judging** | Extraction and judging are simple structured tasks; low effort keeps them fast and cheap. Chat uses `medium`. The server-side refusal fallback is enabled for models that support it. Set `LLM_MODEL` to pick something else. |
 | **OpenAI, Azure AI Foundry and Ollama share one client** | All three expose an OpenAI-compatible `/v1` endpoint, so one small class covers them. Azure accepts the Foundry *project* endpoint and normalises it, and supports either an API key or Entra ID tokens (`azure-identity`, an optional extra). Chat Completions is used rather than the Responses API because Ollama only supports the former. |
+| **Web UI as a static page instead of Streamlit** | A hand-written HTML/CSS/JS page (no build step, no framework) gives full control over the terminal look. It's served by the same FastAPI process and calls only the public REST API, so the UI is also a living example of the API. One process, and a lighter install (no Streamlit or pandas). |
 | **MCP SDK v2 (`MCPServer`)** | The current major version of the official Python SDK. |
 
 ## Limitations
@@ -448,9 +464,9 @@ mini_supermemory/
   engine.py        MemoryEngine — the only thing the entry points talk to
   api.py           REST API (FastAPI)
   mcp_server.py    MCP server (memory / recall / context)
-  ui.py            Streamlit demo UI
+  web/             terminal-style web UI (index.html, app.css, app.js; no build step)
   evaluation.py    evaluation runner + offline rule-based stand-in
-  sample_data.py   "Load sample data" conversation
+  sample_data.py   "Load sample" conversation
   cli.py           `mini-sm` command
 evaluation/
   dataset.json     25 scenarios
@@ -466,7 +482,8 @@ MINI_SM_LIVE_TESTS=1 pytest -m live     # optional end-to-end test against your 
 The suite covers the following: storage and container isolation, chunking, extraction
 (including malformed-output handling), the sneaker sequence (UPDATES / EXTENDS / DUPLICATE),
 hybrid search, expiry with simulated time, profile, forget, the REST API, the MCP tools
-(in-process client), the Streamlit UI (headless `AppTest`) and evaluation scoring.
+(in-process client), the web UI (static assets, plus a real-browser run of the sneaker flow
+that is skipped when Playwright isn't installed) and evaluation scoring.
 
 ---
 

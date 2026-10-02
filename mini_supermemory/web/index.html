@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>mini supermemory</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><rect width='16' height='16' fill='%23111'/><rect x='3' y='3' width='4' height='10' fill='%23888'/><rect x='9' y='3' width='4' height='10' fill='%23eee'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=Silkscreen&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+<div class="frame">
+  <header class="topbar">
+    <div class="logo" aria-label="mini supermemory"><span class="dim">mini</span>supermemory</div>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="chat" class="active">chat</button>
+      <button role="tab" data-tab="memories">memories</button>
+      <button role="tab" data-tab="graph">graph</button>
+      <button role="tab" data-tab="profile">profile</button>
+      <button role="tab" data-tab="search">search</button>
+      <button role="tab" data-tab="eval">eval</button>
+      <button role="tab" data-tab="log">log</button>
+    </nav>
+    <button class="btn-primary" id="load-sample" title="Ingest a sample conversation into this container">⤓ Load sample</button>
+  </header>
+
+  <section class="hero">
+    <h1>The memory layer for AI apps</h1>
+    <p>RAG finds similar text. Memory tracks what is <em>currently true</em> about a user.</p>
+  </section>
+
+  <div class="workspace">
+    <main class="panes">
+      <!-- CHAT -->
+      <section class="pane active" id="pane-chat">
+        <div class="term">
+          <div class="term-head"><span class="dot"></span> session <b class="tag-name"></b><span class="spacer"></span><span class="muted" id="chat-mode"></span></div>
+          <div class="transcript" id="transcript"></div>
+          <form class="prompt" id="chat-form" autocomplete="off">
+            <span class="caret">❯</span>
+            <input id="chat-input" placeholder="I love Adidas sneakers" aria-label="message">
+            <span class="hint">enter ↵</span>
+          </form>
+        </div>
+      </section>
+
+      <!-- MEMORIES -->
+      <section class="pane" id="pane-memories">
+        <div class="pane-head"><h2>memories</h2><span class="muted">current facts first · struck-through facts are kept for history but never retrieved</span></div>
+        <div class="filters" id="mem-filters">
+          <button data-filter="all" class="chip active">all</button>
+          <button data-filter="current" class="chip">current</button>
+          <button data-filter="outdated" class="chip">outdated</button>
+          <button data-filter="expired" class="chip">expired</button>
+          <button data-filter="forgotten" class="chip">forgotten</button>
+        </div>
+        <div id="memory-list" class="list"></div>
+      </section>
+
+      <!-- GRAPH -->
+      <section class="pane" id="pane-graph">
+        <div class="pane-head"><h2>graph</h2><span class="muted">newer → older · <span class="c-red">UPDATES</span> retires the old fact · <span class="c-blue">EXTENDS</span> adds detail</span></div>
+        <div id="graph" class="graph"></div>
+      </section>
+
+      <!-- PROFILE -->
+      <section class="pane" id="pane-profile">
+        <div class="pane-head"><h2>profile</h2><span class="muted">what <code>context</code> / <code>/v1/profile</code> returns right now</span></div>
+        <div class="cols">
+          <fieldset class="box"><legend>static · long-term</legend><ul id="profile-static" class="tree"></ul></fieldset>
+          <fieldset class="box"><legend>dynamic · recent</legend><ul id="profile-dynamic" class="tree"></ul></fieldset>
+        </div>
+        <fieldset class="box"><legend>context prompt</legend><pre id="profile-prompt" class="pre"></pre></fieldset>
+      </section>
+
+      <!-- SEARCH -->
+      <section class="pane" id="pane-search">
+        <div class="pane-head"><h2>search</h2><span class="muted">compare retrieval modes on the same query</span></div>
+        <form id="search-form" class="prompt boxed" autocomplete="off">
+          <span class="caret">?</span>
+          <input id="search-input" placeholder="What sneakers should I buy?" aria-label="query">
+          <select id="search-mode" aria-label="mode">
+            <option value="memories">memories</option>
+            <option value="documents">documents (rag)</option>
+            <option value="hybrid">hybrid</option>
+          </select>
+        </form>
+        <div id="search-results" class="list"></div>
+      </section>
+
+      <!-- EVAL -->
+      <section class="pane" id="pane-eval">
+        <div class="pane-head"><h2>eval</h2><span class="muted">naive RAG vs memory · run <code>mini-sm eval</code> to add results</span></div>
+        <select id="eval-file" aria-label="results file" class="select-wide"></select>
+        <div id="eval-body"></div>
+      </section>
+
+      <!-- LOG -->
+      <section class="pane" id="pane-log">
+        <div class="pane-head"><h2>log</h2><span class="muted">every linking decision, newest first</span></div>
+        <div id="log-list" class="list"></div>
+        <details class="box-details"><summary>raw documents</summary><div id="doc-list" class="list"></div></details>
+      </section>
+    </main>
+
+    <aside class="sidebar">
+      <div class="side-block">
+        <h3>Container</h3>
+        <input id="tag-input" list="tag-options" value="khan" aria-label="container tag" spellcheck="false">
+        <datalist id="tag-options"></datalist>
+      </div>
+
+      <div class="side-block">
+        <h3>Clock</h3>
+        <input type="range" id="offset" min="0" max="336" step="6" value="0" aria-label="simulate time">
+        <div class="kv"><span>offset</span><b id="offset-label">now</b></div>
+        <div class="kv"><span>now</span><span id="now-label" class="muted"></span></div>
+      </div>
+
+      <div class="side-block">
+        <h3>Context</h3>
+        <div class="kv"><span>current</span><b class="c-green" id="n-current">0</b></div>
+        <div class="kv"><span>outdated</span><b class="c-dim" id="n-outdated">0</b></div>
+        <div class="kv"><span>expired</span><b class="c-amber" id="n-expired">0</b></div>
+        <div class="kv"><span>documents</span><b id="n-docs">0</b></div>
+      </div>
+
+      <div class="side-block">
+        <h3>Memory</h3>
+        <ul id="side-memories" class="side-list"></ul>
+      </div>
+
+      <div class="side-block">
+        <h3>Options</h3>
+        <label class="toggle"><input type="checkbox" id="opt-compare" checked> answer (rag vs memory)</label>
+        <label class="toggle"><input type="checkbox" id="opt-remember" checked> remember messages</label>
+        <div class="kv"><span>context k</span><input type="number" id="opt-k" min="1" max="10" value="3" aria-label="k"></div>
+      </div>
+
+      <div class="side-block">
+        <h3>Provider</h3>
+        <div class="kv"><span>llm</span><span id="p-llm" class="muted">…</span></div>
+        <div class="kv"><span>model</span><span id="p-model" class="muted">…</span></div>
+        <div class="kv"><span>embed</span><span id="p-embed" class="muted">…</span></div>
+        <div class="kv"><span>api</span><a href="/docs" target="_blank" class="muted">/docs ↗</a></div>
+      </div>
+
+      <div class="side-block">
+        <button id="reset" class="btn-danger">✕ reset container</button>
+      </div>
+    </aside>
+  </div>
+  <footer class="foot">inspired by supermemory · not affiliated · <span class="muted">keys: 1–7 switch tabs · / focus input</span></footer>
+</div>
+<div id="toast" class="toast" role="status"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
