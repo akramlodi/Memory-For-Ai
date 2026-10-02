@@ -40,12 +40,36 @@ def cmd_mcp(args) -> int:
     return 0
 
 
+def cmd_eval(args) -> int:
+    from .evaluation import run, to_markdown
+    from .llm import LLMError
+
+    try:
+        result = run(offline=args.offline, k=args.k, limit=args.limit, category=args.category,
+                     workers=args.workers, label=args.label)
+    except LLMError as exc:
+        print(f"[FAIL] {exc}")
+        return 1
+    print(to_markdown(result))
+    print(f"Saved to evaluation/results/{result['label']}.json and .md ({result['seconds']}s)")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="mini-sm", description="Mini-Supermemory command line")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check", help="check that the configured LLM provider works").set_defaults(func=cmd_check)
     sub.add_parser("api", help="run the REST API").set_defaults(func=cmd_api)
     sub.add_parser("mcp", help="run the MCP server over stdio (for Claude Desktop)").set_defaults(func=cmd_mcp)
+    ev = sub.add_parser("eval", help="run the RAG-vs-memory evaluation")
+    ev.add_argument("--offline", action="store_true",
+                    help="use a rule-based stand-in for the LLM and hash embeddings (pipeline sanity check only)")
+    ev.add_argument("--k", type=int, default=3, help="top-k for Recall@k (default 3)")
+    ev.add_argument("--limit", type=int, default=None, help="only run the first N scenarios")
+    ev.add_argument("--category", choices=["knowledge_update", "extension", "expiry"], default=None)
+    ev.add_argument("--workers", type=int, default=4, help="scenarios run in parallel (default 4)")
+    ev.add_argument("--label", default=None, help="results file name (default: latest / offline-heuristic)")
+    ev.set_defaults(func=cmd_eval)
     args = parser.parse_args(argv)
     try:
         settings = load_settings()
