@@ -24,9 +24,9 @@ WEB_DIR = Path(__file__).with_name("web")
 
 settings = load_settings()
 app = FastAPI(
-    title="Mini-Supermemory",
+    title="Elephantus",
     version=__version__,
-    description="A small, local memory layer for AI apps (inspired by, not affiliated with, Supermemory).",
+    description="Elephantus: a small, local memory layer for AI apps.",
 )
 
 
@@ -172,7 +172,7 @@ def sample_data() -> list[str]:
 
 @app.get("/v1/eval/results", tags=["meta"])
 def eval_results() -> list[dict]:
-    """Saved evaluation results (newest first), as written by `mini-sm eval`."""
+    """Saved evaluation results (newest first), as written by `elephantus eval`."""
     from .evaluation import load_results
 
     return load_results()

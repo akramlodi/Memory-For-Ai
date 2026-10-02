@@ -1,4 +1,4 @@
-// mini supermemory — terminal-style web UI. Talks only to the REST API (same engine as MCP).
+// Elephantus — terminal-style web UI. Talks only to the REST API (same engine as MCP).
 "use strict";
 
 const $ = (sel) => document.querySelector(sel);
@@ -326,11 +326,11 @@ async function renderEval() {
 }
 function renderEvalBody() {
   const body = $("#eval-body");
-  if (!evalResults.length) { body.replaceChildren(h("div", { class: "empty" }, "No results yet. Run `mini-sm eval` (or `mini-sm eval --offline`).")); return; }
+  if (!evalResults.length) { body.replaceChildren(h("div", { class: "empty" }, "No results yet. Run `elephantus eval` (or `elephantus eval --offline`).")); return; }
   const r = evalResults[$("#eval-file").value || 0];
   const modes = ["rag", "memory", "hybrid"];
   const nodes = [];
-  if (r.provider.includes("heuristic")) nodes.push(h("div", { class: "warn" }, "⚠ Offline rule-based stand-in, not an LLM — these numbers only sanity-check the pipeline. Run `mini-sm eval` with a provider for real numbers."));
+  if (r.provider.includes("heuristic")) nodes.push(h("div", { class: "warn" }, "⚠ Offline rule-based stand-in, not an LLM — these numbers only sanity-check the pipeline. Run `elephantus eval` with a provider for real numbers."));
   nodes.push(h("div", { class: "muted" }, `provider ${r.provider} · model ${r.model} · embeddings ${r.embedding} · k=${r.k} · ${r.n_scenarios} scenarios`));
 
   const head = h("tr", {}, h("th", {}, "category"), h("th", {}, "n"),

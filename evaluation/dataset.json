@@ -1,5 +1,5 @@
 {
- "description": "Mini-Supermemory evaluation scenarios. Each scenario's messages are added (one per simulated hour, after shared background 'filler' messages) to a fresh container; the question is asked at ask_at_hours. 'expected' is a list of facts, each a list of alternative keywords (matched at word starts, case-insensitive). 'stale' lists keywords of outdated/expired facts.",
+ "description": "Elephantus evaluation scenarios. Each scenario's messages are added (one per simulated hour, after shared background 'filler' messages) to a fresh container; the question is asked at ask_at_hours. 'expected' is a list of facts, each a list of alternative keywords (matched at word starts, case-insensitive). 'stale' lists keywords of outdated/expired facts.",
  "filler": [
   "I have a golden retriever named Max.",
   "My favourite cuisine is Thai food.",

@@ -1,4 +1,4 @@
-"""Command line entry point: `mini-sm <command>`."""
+"""Command line entry point: `elephantus <command>`."""
 
 from __future__ import annotations
 
@@ -29,7 +29,7 @@ def cmd_api(args) -> int:
     import uvicorn
 
     settings = load_settings()
-    uvicorn.run("mini_supermemory.api:app", host=settings.api_host, port=settings.api_port)
+    uvicorn.run("elephantus.api:app", host=settings.api_host, port=settings.api_port)
     return 0
 
 
@@ -45,7 +45,7 @@ def cmd_start(args) -> int:
         import webbrowser
 
         threading.Timer(1.5, webbrowser.open, [f"http://{settings.api_host}:{settings.api_port}/"]).start()
-    uvicorn.run("mini_supermemory.api:app", host=settings.api_host, port=settings.api_port)
+    uvicorn.run("elephantus.api:app", host=settings.api_host, port=settings.api_port)
     return 0
 
 
@@ -72,7 +72,7 @@ def cmd_eval(args) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="mini-sm", description="Mini-Supermemory command line")
+    parser = argparse.ArgumentParser(prog="elephantus", description="Elephantus command line")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("check", help="check that the configured LLM provider works").set_defaults(func=cmd_check)
     for name in ("start", "ui"):

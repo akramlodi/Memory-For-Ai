@@ -1,11 +1,11 @@
 """MCP server exposing the memory engine to Claude Desktop (or any MCP client).
 
-Tools (mirroring Supermemory's MCP design):
+Tools:
 * ``memory``  — save information, or forget it (action="forget")
 * ``recall``  — search memories; returns results plus a profile summary
 * ``context`` — the full profile, for injection at the start of a conversation
 
-Runs over stdio:  python -m mini_supermemory.mcp_server   (or: mini-sm mcp)
+Runs over stdio:  python -m elephantus.mcp_server   (or: elephantus mcp)
 Uses the same engine and SQLite file as the REST API and the UI.
 """
 
@@ -34,7 +34,7 @@ def _bullets(items: list[str]) -> str:
 
 
 def build_server(get_engine: Callable[[], MemoryEngine], default_tag: str) -> MCPServer:
-    server = MCPServer("mini-supermemory", instructions=INSTRUCTIONS)
+    server = MCPServer("elephantus", instructions=INSTRUCTIONS)
 
     @server.tool()
     def memory(content: str, action: Literal["save", "forget"] = "save", container_tag: str | None = None) -> str:

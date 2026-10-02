@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mini-supermemory"
+name = "elephantus"
 version = "0.1.0"
-description = "A small, local, educational memory layer for AI apps, inspired by Supermemory."
+description = "Elephantus: a small, local memory layer for AI apps."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -25,11 +25,11 @@ dev = ["pytest>=8", "httpx>=0.27"]
 azure = ["azure-identity>=1.17"]  # only needed for AZURE_USE_ENTRA_ID=true
 
 [project.scripts]
-mini-sm = "mini_supermemory.cli:main"
+elephantus = "elephantus.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mini_supermemory"]
+packages = ["elephantus"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-markers = ["live: needs a real LLM provider (skipped unless MINI_SM_LIVE_TESTS=1)"]
+markers = ["live: needs a real LLM provider (skipped unless ELEPHANTUS_LIVE_TESTS=1)"]

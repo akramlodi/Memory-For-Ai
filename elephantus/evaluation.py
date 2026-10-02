@@ -1,7 +1,7 @@
 """Evaluation: naive RAG baseline vs. memory retrieval on scripted scenarios.
 
-    mini-sm eval                # uses the configured LLM + embeddings
-    mini-sm eval --offline      # heuristic stand-in for the LLM + hash embeddings (no key, no download)
+    elephantus eval                # uses the configured LLM + embeddings
+    elephantus eval --offline      # heuristic stand-in for the LLM + hash embeddings (no key, no download)
 
 For every scenario a fresh container gets the shared filler messages and the
 scenario messages (one per simulated hour), then the question is asked at
@@ -176,7 +176,7 @@ class HeuristicLLM:
 
     It is deliberately simple (sentence splitting, keyword cues, word overlap) and is
     NOT representative of LLM quality — use it to sanity-check the pipeline, and run
-    `mini-sm eval` with a real provider for meaningful numbers.
+    `elephantus eval` with a real provider for meaningful numbers.
     """
 
     name = "heuristic"

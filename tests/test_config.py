@@ -1,7 +1,7 @@
 import pytest
 
-from mini_supermemory.config import ConfigError, Settings, load_settings
-from mini_supermemory.llm import create_llm
+from elephantus.config import ConfigError, Settings, load_settings
+from elephantus.llm import create_llm
 
 
 def test_defaults_per_provider():
@@ -36,7 +36,7 @@ def test_relative_db_path_resolves_to_project_root(monkeypatch):
 def test_health_endpoint():
     from fastapi.testclient import TestClient
 
-    from mini_supermemory.api import app
+    from elephantus.api import app
 
     r = TestClient(app).get("/health")
     assert r.status_code == 200 and r.json()["status"] == "ok"

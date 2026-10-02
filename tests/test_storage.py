@@ -1,9 +1,9 @@
 from tests.fakes import FakeLLM
 import numpy as np
 
-from mini_supermemory.chunking import chunk_text
-from mini_supermemory.embeddings import HashEmbedder
-from mini_supermemory.search import fts_query, reciprocal_rank_fusion
+from elephantus.chunking import chunk_text
+from elephantus.embeddings import HashEmbedder
+from elephantus.search import fts_query, reciprocal_rank_fusion
 
 
 def test_chunking_short_and_long():
@@ -67,9 +67,9 @@ def test_fts_query_and_rrf():
 def test_api_add_and_search(tmp_path, monkeypatch):
     from fastapi.testclient import TestClient
 
-    from mini_supermemory import api
-    from mini_supermemory.config import Settings
-    from mini_supermemory.engine import MemoryEngine
+    from elephantus import api
+    from elephantus.config import Settings
+    from elephantus.engine import MemoryEngine
 
     eng = MemoryEngine(Settings(embedding_backend="hash"), embedder=HashEmbedder(), llm=FakeLLM(), db_path=tmp_path / "a.db")
     monkeypatch.setattr(api, "get_engine", lambda: eng)
